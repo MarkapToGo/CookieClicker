@@ -20,6 +20,7 @@ public class ClickListener implements Listener {
         this.plugin = plugin;
     }
 
+
     @EventHandler
     public void onPlayerUse(PlayerInteractEvent event) {
         if (event.getClickedBlock() == null) {
@@ -38,7 +39,9 @@ public class ClickListener implements Listener {
                 UpgradeGUI.openInventory(event.getPlayer());
             } else if (event.getAction() == Action.LEFT_CLICK_BLOCK) {
 
-                int cookies = plugin.loadCookies(event.getPlayer()) + plugin.loadCookiesPerClick(event.getPlayer()); // Increment cookies by cookies per click
+                // Ensure cookies per click are applied correctly
+                int cookiesPerClick = plugin.loadCookiesPerClick(event.getPlayer());
+                int cookies = plugin.loadCookies(event.getPlayer()) + cookiesPerClick; // Increment cookies by cookies per click
                 plugin.saveCookies(event.getPlayer(), cookies); // Save new cookie count
 
                 // Send action bar message

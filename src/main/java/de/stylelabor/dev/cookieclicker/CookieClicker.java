@@ -36,6 +36,8 @@ public final class CookieClicker extends JavaPlugin implements Listener {
         // Load upgrades
         getServer().getPluginManager().registerEvents(new UpgradeGUI(), this);
 
+        // Load cookies per click values from storage
+        loadCookiesPerClickFromStorage();
 
         // Load upgrades from config
         setupUpgradesConfig();
@@ -77,7 +79,7 @@ public final class CookieClicker extends JavaPlugin implements Listener {
         ConfigurationSection upgradesSection = upgradesConfig.getConfigurationSection("upgrades");
         if (upgradesSection != null) {
             for (String key : upgradesSection.getKeys(false)) {
-                getLogger().info("Loading upgrade: " + key);
+                // getLogger().info("Loading upgrade: " + key);
                 String name = upgradesSection.getString(key + ".name");
                 Material item = Material.valueOf(upgradesSection.getString(key + ".item"));
                 int cost = upgradesSection.getInt(key + ".cost");
@@ -87,13 +89,26 @@ public final class CookieClicker extends JavaPlugin implements Listener {
         } else {
             getLogger().severe("Failed to load upgrades section from config.");
         }
-        getLogger().info(upgrades.size() + " upgrades loaded.");
+        // getLogger().info(upgrades.size() + " upgrades loaded.");
         return upgrades;
     }
 
 
     public String getLanguageMessage(String path, String defaultValue) {
         return languageConfig.getString("messages." + path, defaultValue);
+    }
+
+    public void loadCookiesPerClickFromStorage() {
+        File cookiesPerClickFile = new File(getDataFolder(), "cookies-per-click.yml");
+        if (!cookiesPerClickFile.exists()) {
+            return; // File doesn't exist, nothing to load
+        }
+        FileConfiguration cookiesPerClickConfig = YamlConfiguration.loadConfiguration(cookiesPerClickFile);
+        for (String key : cookiesPerClickConfig.getKeys(false)) {
+            UUID playerUUID = UUID.fromString(key);
+            int cookiesPerClick = cookiesPerClickConfig.getInt(key);
+            cookiesPerClickMap.put(playerUUID, cookiesPerClick);
+        }
     }
 
     // Method to load cookies from cookies.yml with error handling for file creation
@@ -120,29 +135,36 @@ public final class CookieClicker extends JavaPlugin implements Listener {
         return cookiesPerClickMap.getOrDefault(player.getUniqueId(), 1); // Default to 1 if not found
     }
 
-    // Method to save cookies per click for a player in CookieClicker.java
     public void saveCookiesPerClick(Player player, int cookiesPerClick) {
-        File cookiesFile = new File(getDataFolder(), "cookies.yml");
-        FileConfiguration cookiesConfig = YamlConfiguration.loadConfiguration(cookiesFile);
-        // Save cookiesPerClick value for the player
-        cookiesConfig.set(player.getUniqueId() + ".cookiesPerClick", cookiesPerClick);
+        File cookiesPerClickFile = new File(getDataFolder(), "cookies-per-click.yml");
+        if (!cookiesPerClickFile.exists()) {
+            try {
+                if (!cookiesPerClickFile.createNewFile()) {
+                    getLogger().warning("Failed to create cookies-per-click.yml as it already exists.");
+                }
+            } catch (IOException e) {
+                getLogger().log(Level.SEVERE, "Could not create cookies-per-click.yml", e);
+                return;
+            }
+        }
+        FileConfiguration cookiesPerClickConfig = YamlConfiguration.loadConfiguration(cookiesPerClickFile);
+        cookiesPerClickConfig.set(player.getUniqueId().toString(), cookiesPerClick);
         try {
-            cookiesConfig.save(cookiesFile);
+            cookiesPerClickConfig.save(cookiesPerClickFile);
+            getLogger().info("Successfully saved " + cookiesPerClick + " cookiesPerClick for player " + player.getUniqueId() + " to cookies-per-click.yml");
         } catch (IOException e) {
-            getLogger().log(Level.SEVERE, "Could not save cookiesPerClick to cookies.yml", e);
+            getLogger().log(Level.SEVERE, "Could not save cookiesPerClick to cookies-per-click.yml", e);
         }
     }
 
-    // Corrected method to get cookies per click for a player
-    public int getCookiesPerClick(Player player) {
-        // Use player.getUniqueId() to fetch the UUID from the player object
-        return cookiesPerClickMap.getOrDefault(player.getUniqueId(), 1); // Default to 1 if not found
-    }
 
-    // Corrected method to set cookies per click for a player
-    public void setCookiesPerClick(Player player, int cookiesPerClick) {
-        // Use player.getUniqueId() to fetch the UUID from the player object
-        cookiesPerClickMap.put(player.getUniqueId(), cookiesPerClick);
+    public int getCookiesPerClick(Player player) {
+        File cookiesPerClickFile = new File(getDataFolder(), "cookies-per-click.yml");
+        if (!cookiesPerClickFile.exists()) {
+            return 1; // Return default value if file doesn't exist
+        }
+        FileConfiguration cookiesPerClickConfig = YamlConfiguration.loadConfiguration(cookiesPerClickFile);
+        return cookiesPerClickConfig.getInt(player.getUniqueId().toString(), 1); // Default to 1 if not found
     }
 
     // Method to save cookies to cookies.yml
@@ -195,6 +217,14 @@ public final class CookieClicker extends JavaPlugin implements Listener {
             // Prevent moving items in, out, or within the GUI
             event.setCancelled(true);
         }
+    }
+
+    public void updateCookiesPerClick(Player player, int cookiesPerClick) {
+        // Update the map
+        cookiesPerClickMap.put(player.getUniqueId(), cookiesPerClick);
+
+        // Save to persistent storage
+        saveCookiesPerClick(player, cookiesPerClick);
     }
 
 

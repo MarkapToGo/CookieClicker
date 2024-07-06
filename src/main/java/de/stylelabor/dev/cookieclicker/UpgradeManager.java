@@ -30,7 +30,8 @@ public class UpgradeManager {
     private void applyUpgradeEffect(Player player, Upgrade upgrade) {
         int currentCookiesPerClick = plugin.loadCookiesPerClick(player);
         int newCookiesPerClick = currentCookiesPerClick + upgrade.getCookiesPerClick();
-        plugin.saveCookiesPerClick(player, newCookiesPerClick);
+        // Assuming updateCookiesPerClick method exists and updates both the map and persistent storage
+        plugin.updateCookiesPerClick(player, newCookiesPerClick);
         player.sendMessage("Your cookies per click have been increased to " + newCookiesPerClick + "!");
     }
 }

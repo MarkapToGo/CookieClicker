@@ -76,8 +76,8 @@ public class UpgradeGUI implements Listener {
                         UpgradeManager upgradeManager = new UpgradeManager(plugin);
                         if (upgradeManager.canAffordUpgrade(player, upgrade)) {
                             upgradeManager.processUpgradePurchase(player, upgrade);
-                            player.closeInventory(); // Close the inventory after purchase
-                            openUpgradeGUI(player, plugin); // Re-open the inventory to reflect changes
+                            // player.closeInventory(); // Close the inventory after purchase
+                            // openUpgradeGUI(player, plugin); // Re-open the inventory to reflect changes
                         } else {
                             player.sendMessage("You do not have enough cookies to purchase this upgrade.");
                         }
@@ -114,9 +114,8 @@ public class UpgradeGUI implements Listener {
                 meta.setDisplayName(upgrade.getName() + " - Cost: " + upgrade.getCost());
                 item.setItemMeta(meta);
             }
-            upgradeInv.setItem(18 + 2 + i, item); // Place in 3rd row, starting from 2nd slot
+            upgradeInv.setItem(17 + 2 + i, item); // Place in 3rd row, starting from 2nd slot | counting from 0
         }
-
 
         // Fetch the player's cookies per click and current cookies
         int cookiesPerClick = plugin.getCookiesPerClick(player);
