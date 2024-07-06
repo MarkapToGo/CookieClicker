@@ -1,0 +1,6 @@
+messages:
+  cookie_click: "Cookie count increased to: %cookies%"
+  block_break_denied: "You cannot break the clicker block!"
+
+gui:
+  upgrade_title: "Cookie Upgrades"

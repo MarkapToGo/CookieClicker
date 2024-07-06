@@ -1,0 +1,11 @@
+upgrades:
+  upgrade1:
+    name: "Upgrade 1"
+    item: DIAMOND
+    cost: 100
+    cookies-per-click: 2
+  upgrade2:
+    name: "Upgrade 2"
+    item: GOLD_INGOT
+    cost: 200
+    cookies-per-click: 4
