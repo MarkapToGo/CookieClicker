@@ -93,6 +93,7 @@ public class UpgradePagination implements Listener {
         if (!(event.getWhoClicked() instanceof Player)) return;
 
         Player player = (Player) event.getWhoClicked();
+
         Inventory inv = event.getClickedInventory();
         ItemStack clickedItem = event.getCurrentItem();
 
@@ -115,7 +116,8 @@ public class UpgradePagination implements Listener {
             if (currentPage > 0) {
                 openInventory(player, currentPage - 1);
             }
-        } else if (clickedItem.getType() == Material.BARRIER && Objects.requireNonNull(clickedItem.getItemMeta()).getDisplayName().contains("Back to Main Menu")) {
+    } else if (clickedItem.getType() == Material.ARROW && Objects.requireNonNull(clickedItem.getItemMeta()).getDisplayName().contains("Back to Main Menu")) {
+            // Open the GUI for upgrades
             UpgradeGUI.openInventory(player);
         }
     }

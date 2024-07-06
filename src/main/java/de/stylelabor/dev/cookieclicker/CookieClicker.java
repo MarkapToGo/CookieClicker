@@ -157,7 +157,6 @@ public final class CookieClicker extends JavaPlugin implements Listener {
         }
     }
 
-
     public int getCookiesPerClick(Player player) {
         File cookiesPerClickFile = new File(getDataFolder(), "cookies-per-click.yml");
         if (!cookiesPerClickFile.exists()) {
@@ -211,7 +210,6 @@ public final class CookieClicker extends JavaPlugin implements Listener {
     public void onInventoryClick(InventoryClickEvent event) {
         // Dynamically fetch the title for the "Cookie Upgrades" GUI
         String cookieUpgradesTitle = getGUITitle("upgrade_title", "Cookie Upgrades");
-
         // Check if the inventory clicked has a title that matches one of your custom GUIs
         if (cookieUpgradesTitle.equals(event.getView().getTitle())) {
             // Prevent moving items in, out, or within the GUI
@@ -222,7 +220,6 @@ public final class CookieClicker extends JavaPlugin implements Listener {
     public void updateCookiesPerClick(Player player, int cookiesPerClick) {
         // Update the map
         cookiesPerClickMap.put(player.getUniqueId(), cookiesPerClick);
-
         // Save to persistent storage
         saveCookiesPerClick(player, cookiesPerClick);
     }

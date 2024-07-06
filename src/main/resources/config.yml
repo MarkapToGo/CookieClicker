@@ -6,4 +6,4 @@ click-sound:
 gui_open_sound:
   sound: "BLOCK_BARREL_OPEN"
   volume: 0.6
-  pitch: 1.7
+  pitch: 1.6
