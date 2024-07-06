@@ -1,9 +1,9 @@
 click-sound:
   sound: BLOCK_NOTE_BLOCK_PLING
-  volume: 0.5
+  volume: 0.4
   pitch: 1.0
 
 gui_open_sound:
   sound: "BLOCK_BARREL_OPEN"
   volume: 0.6
-  pitch: 1.0
+  pitch: 1.7

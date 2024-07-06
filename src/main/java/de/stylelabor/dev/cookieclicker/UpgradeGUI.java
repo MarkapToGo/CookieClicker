@@ -103,44 +103,52 @@ public class UpgradeGUI implements Listener {
     }
 
     public void openUpgradeGUI(Player player, CookieClicker plugin) {
-        Inventory upgradeInv = Bukkit.createInventory(null, 45, "Cookie Upgrades"); // 5 rows x 9 slots = 45 slots
         List<Upgrade> upgrades = JavaPlugin.getPlugin(CookieClicker.class).loadUpgrades();
+        int totalPages = (int) Math.ceil((double) upgrades.size() / UpgradePagination.getUpgradesPerPage());
 
-        for (int i = 0; i < upgrades.size(); i++) {
-            Upgrade upgrade = upgrades.get(i);
-            ItemStack item = new ItemStack(upgrade.getItem());
-            ItemMeta meta = item.getItemMeta();
-            if (meta != null) {
-                meta.setDisplayName(upgrade.getName() + " - Cost: " + upgrade.getCost());
-                item.setItemMeta(meta);
+        if (totalPages > 1) {
+            // If more than one page is needed, use UpgradePagination to handle it
+            UpgradePagination pagination = new UpgradePagination(plugin);
+            pagination.openInventory(player, 0); // Open the first page
+        } else {
+            // If all upgrades fit on one page, use the existing logic to display them
+            Inventory upgradeInv = Bukkit.createInventory(null, 45, "Cookie Upgrades"); // 5 rows x 9 slots = 45 slots
+
+            for (int i = 0; i < upgrades.size(); i++) {
+                Upgrade upgrade = upgrades.get(i);
+                ItemStack item = new ItemStack(upgrade.getItem());
+                ItemMeta meta = item.getItemMeta();
+                if (meta != null) {
+                    meta.setDisplayName(upgrade.getName() + " - Cost: " + upgrade.getCost());
+                    item.setItemMeta(meta);
+                }
+                upgradeInv.setItem(17 + 2 + i, item); // Adjust the slot placement as needed
             }
-            upgradeInv.setItem(17 + 2 + i, item); // Place in 3rd row, starting from 2nd slot | counting from 0
+
+            // Fetch the player's cookies per click and current cookies
+            int cookiesPerClick = plugin.getCookiesPerClick(player);
+            int currentCookies = plugin.loadCookies(player);
+
+            // Create an orange terracotta block to display cookies per click
+            ItemStack cookiesPerClickItem = new ItemStack(Material.ORANGE_TERRACOTTA);
+            ItemMeta cookiesPerClickMeta = cookiesPerClickItem.getItemMeta();
+            if (cookiesPerClickMeta != null) {
+                cookiesPerClickMeta.setDisplayName("Cookies per Click: " + cookiesPerClick);
+                cookiesPerClickItem.setItemMeta(cookiesPerClickMeta);
+            }
+
+            // Create a brown terracotta block to display current cookies
+            ItemStack currentCookiesItem = new ItemStack(Material.BROWN_TERRACOTTA);
+            ItemMeta currentCookiesMeta = currentCookiesItem.getItemMeta();
+            if (currentCookiesMeta != null) {
+                currentCookiesMeta.setDisplayName("Current Cookies: " + currentCookies);
+                currentCookiesItem.setItemMeta(currentCookiesMeta);
+            }
+
+            // Place the items in the specified slots
+            upgradeInv.setItem(2, cookiesPerClickItem); // 3rd slot (index 2)
+            upgradeInv.setItem(6, currentCookiesItem); // 7th slot (index 6)
+            player.openInventory(upgradeInv);
         }
 
-        // Fetch the player's cookies per click and current cookies
-        int cookiesPerClick = plugin.getCookiesPerClick(player);
-        int currentCookies = plugin.loadCookies(player);
-
-        // Create an orange terracotta block to display cookies per click
-        ItemStack cookiesPerClickItem = new ItemStack(Material.ORANGE_TERRACOTTA);
-        ItemMeta cookiesPerClickMeta = cookiesPerClickItem.getItemMeta();
-        if (cookiesPerClickMeta != null) {
-            cookiesPerClickMeta.setDisplayName("Cookies per Click: " + cookiesPerClick);
-            cookiesPerClickItem.setItemMeta(cookiesPerClickMeta);
-        }
-
-        // Create a brown terracotta block to display current cookies
-        ItemStack currentCookiesItem = new ItemStack(Material.BROWN_TERRACOTTA);
-        ItemMeta currentCookiesMeta = currentCookiesItem.getItemMeta();
-        if (currentCookiesMeta != null) {
-            currentCookiesMeta.setDisplayName("Current Cookies: " + currentCookies);
-            currentCookiesItem.setItemMeta(currentCookiesMeta);
-        }
-
-        // Place the items in the specified slots
-        upgradeInv.setItem(2, cookiesPerClickItem); // 3rd slot (index 2)
-        upgradeInv.setItem(6, currentCookiesItem); // 7th slot (index 6)
-        player.openInventory(upgradeInv);
-    }
-
-}
+    }}

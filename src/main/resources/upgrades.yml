@@ -9,3 +9,33 @@ upgrades:
     item: GOLD_INGOT
     cost: 200
     cookies-per-click: 4
+  upgrade3:
+    name: "Upgrade 4"
+    item: DIAMOND
+    cost: 100
+    cookies-per-click: 6
+  upgrade4:
+    name: "Upgrade 4"
+    item: GOLD_INGOT
+    cost: 1000
+    cookies-per-click: 20
+  upgrade5:
+    name: "Upgrade 5"
+    item: GOLD_INGOT
+    cost: 5000
+    cookies-per-click: 50
+  upgrade6:
+    name: "Upgrade 6"
+    item: GOLD_INGOT
+    cost: 90000
+    cookies-per-click: 60
+  upgrade7:
+    name: "Upgrade 7"
+    item: GOLD_INGOT
+    cost: 900000
+    cookies-per-click: 200
+  upgrade8:
+    name: "Upgrade 8"
+    item: GOLD_INGOT
+    cost: 2000000
+    cookies-per-click: 250
