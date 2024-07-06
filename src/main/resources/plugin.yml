@@ -1,0 +1,4 @@
+name: CookieClicker
+version: '${project.version}'
+main: de.stylelabor.dev.cookieclicker.CookieClicker
+api-version: '1.20'
