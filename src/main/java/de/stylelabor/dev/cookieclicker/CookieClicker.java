@@ -15,10 +15,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.logging.Level;
 
 public final class CookieClicker extends JavaPlugin implements Listener {
@@ -26,7 +23,7 @@ public final class CookieClicker extends JavaPlugin implements Listener {
 
     private FileConfiguration languageConfig;
     private FileConfiguration upgradesConfig;
-    private final HashMap<Player, Integer> cookiesPerClickMap = new HashMap<>();
+    private final HashMap<UUID, Integer> cookiesPerClickMap = new HashMap<>();
 
     @Override
     public void onEnable() {
@@ -118,15 +115,34 @@ public final class CookieClicker extends JavaPlugin implements Listener {
         return cookiesConfig.getInt(player.getUniqueId().toString(), 0); // Default to 0 if not found
     }
 
-    // Method to get cookies per click for a player
-    public int getCookiesPerClick(Player player) {
-        // Return the cookies per click for the player, defaulting to 1 if not found
-        return cookiesPerClickMap.getOrDefault(player, 1);
+    // Method to load cookies per click for a player
+    public int loadCookiesPerClick(Player player) {
+        return cookiesPerClickMap.getOrDefault(player.getUniqueId(), 1); // Default to 1 if not found
     }
 
-    // Method to set cookies per click for a player
+    // Method to save cookies per click for a player in CookieClicker.java
+    public void saveCookiesPerClick(Player player, int cookiesPerClick) {
+        File cookiesFile = new File(getDataFolder(), "cookies.yml");
+        FileConfiguration cookiesConfig = YamlConfiguration.loadConfiguration(cookiesFile);
+        // Save cookiesPerClick value for the player
+        cookiesConfig.set(player.getUniqueId() + ".cookiesPerClick", cookiesPerClick);
+        try {
+            cookiesConfig.save(cookiesFile);
+        } catch (IOException e) {
+            getLogger().log(Level.SEVERE, "Could not save cookiesPerClick to cookies.yml", e);
+        }
+    }
+
+    // Corrected method to get cookies per click for a player
+    public int getCookiesPerClick(Player player) {
+        // Use player.getUniqueId() to fetch the UUID from the player object
+        return cookiesPerClickMap.getOrDefault(player.getUniqueId(), 1); // Default to 1 if not found
+    }
+
+    // Corrected method to set cookies per click for a player
     public void setCookiesPerClick(Player player, int cookiesPerClick) {
-        cookiesPerClickMap.put(player, cookiesPerClick);
+        // Use player.getUniqueId() to fetch the UUID from the player object
+        cookiesPerClickMap.put(player.getUniqueId(), cookiesPerClick);
     }
 
     // Method to save cookies to cookies.yml

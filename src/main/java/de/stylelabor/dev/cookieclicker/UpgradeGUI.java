@@ -14,6 +14,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.List;
+import java.util.Objects;
 
 public class UpgradeGUI implements Listener {
 
@@ -63,16 +64,31 @@ public class UpgradeGUI implements Listener {
         CookieClicker plugin = JavaPlugin.getPlugin(CookieClicker.class);
         String guiTitle = plugin.getGUITitle("upgrade_title", "Cookie Upgrades");
         if (event.getView().getTitle().equals(guiTitle)) {
-            // Check if the clicked item is not null and is the green concrete block
-            if (event.getCurrentItem() != null && event.getCurrentItem().getType() == Material.GREEN_CONCRETE) {
-                // Prevent the default behaviour
-                event.setCancelled(true);
-                // Open the upgrade GUI for the player
+            event.setCancelled(true); // Prevent any inventory action
+
+            ItemStack clickedItem = event.getCurrentItem();
+            if (clickedItem != null && clickedItem.hasItemMeta() && Objects.requireNonNull(clickedItem.getItemMeta()).hasDisplayName()) {
+                List<Upgrade> upgrades = plugin.loadUpgrades();
                 Player player = (Player) event.getWhoClicked();
-                openUpgradeGUI(player, plugin);
-            } else {
-                // Prevent any other interaction within the GUI
-                event.setCancelled(true);
+
+                for (Upgrade upgrade : upgrades) {
+                    if (clickedItem.getType() == upgrade.getItem() && clickedItem.getItemMeta().getDisplayName().contains(upgrade.getName())) {
+                        UpgradeManager upgradeManager = new UpgradeManager(plugin);
+                        if (upgradeManager.canAffordUpgrade(player, upgrade)) {
+                            upgradeManager.processUpgradePurchase(player, upgrade);
+                            player.closeInventory(); // Close the inventory after purchase
+                            openUpgradeGUI(player, plugin); // Re-open the inventory to reflect changes
+                        } else {
+                            player.sendMessage("You do not have enough cookies to purchase this upgrade.");
+                        }
+                        return; // Exit the method after handling the upgrade item
+                    }
+                }
+
+                // If the clicked item is the green concrete block, open the upgrade GUI
+                if (clickedItem.getType() == Material.GREEN_CONCRETE) {
+                    openUpgradeGUI(player, plugin);
+                }
             }
         }
     }
