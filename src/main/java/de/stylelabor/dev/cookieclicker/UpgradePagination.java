@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Objects;
 
 public class UpgradePagination implements Listener {
+
     private final CookieClicker plugin;
     private static final int UPGRADES_PER_PAGE = 7; // 9 slots in a row - 2 for leaving first and last cell empty
 
@@ -93,7 +94,6 @@ public class UpgradePagination implements Listener {
         if (!(event.getWhoClicked() instanceof Player)) return;
 
         Player player = (Player) event.getWhoClicked();
-
         Inventory inv = event.getClickedInventory();
         ItemStack clickedItem = event.getCurrentItem();
 
@@ -116,9 +116,22 @@ public class UpgradePagination implements Listener {
             if (currentPage > 0) {
                 openInventory(player, currentPage - 1);
             }
-    } else if (clickedItem.getType() == Material.ARROW && Objects.requireNonNull(clickedItem.getItemMeta()).getDisplayName().contains("Back to Main Menu")) {
+        } else if (clickedItem.getType() == Material.BARRIER && Objects.requireNonNull(clickedItem.getItemMeta()).getDisplayName().contains("Back to Main Menu")) {
             // Open the GUI for upgrades
+            player.closeInventory();
             UpgradeGUI.openInventory(player);
+        } else {
+            // Handle upgrade item clicks
+            for (Upgrade upgrade : plugin.loadUpgrades()) {
+                if (Objects.requireNonNull(clickedItem.getItemMeta()).getDisplayName().contains(upgrade.getName())) {
+                    // Check if the player can afford the upgrade
+                    if (CookieClicker.getUpgradeManager().canAffordUpgrade(player, upgrade)) {
+                        // Process the upgrade purchase
+                        CookieClicker.getUpgradeManager().processUpgradePurchase(player, upgrade);
+                    }
+                    break; // Exit the loop once the matching upgrade is found and processed
+                }
+            }
         }
     }
 }

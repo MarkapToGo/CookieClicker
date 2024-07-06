@@ -1,9 +1,6 @@
 package de.stylelabor.dev.cookieclicker;
 
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -24,6 +21,7 @@ public final class CookieClicker extends JavaPlugin implements Listener {
     private FileConfiguration languageConfig;
     private FileConfiguration upgradesConfig;
     private final HashMap<UUID, Integer> cookiesPerClickMap = new HashMap<>();
+    private static UpgradeManager upgradeManager; // Declare the upgradeManager variable
 
     @Override
     public void onEnable() {
@@ -41,6 +39,9 @@ public final class CookieClicker extends JavaPlugin implements Listener {
 
         // Load upgrades from config
         setupUpgradesConfig();
+
+        // Initialize the UpgradeManager instance
+        upgradeManager = new UpgradeManager(this);
 
         // Load language file
         loadLanguageFile();
@@ -63,6 +64,10 @@ public final class CookieClicker extends JavaPlugin implements Listener {
             saveResource("language.yml", false);
         }
         languageConfig = YamlConfiguration.loadConfiguration(languageFile);
+    }
+
+    public static UpgradeManager getUpgradeManager() {
+        return upgradeManager;
     }
 
     private void setupUpgradesConfig() {
@@ -215,6 +220,19 @@ public final class CookieClicker extends JavaPlugin implements Listener {
             // Prevent moving items in, out, or within the GUI
             event.setCancelled(true);
         }
+    }
+
+    public Sound getPurchaseSound() {
+        String soundName = getConfig().getString("purchase-sound.sound", "ENTITY_PLAYER_LEVELUP");
+        return Sound.valueOf(soundName);
+    }
+
+    public float getPurchaseVolume() {
+        return (float) getConfig().getDouble("purchase-sound.volume", 1.0);
+    }
+
+    public float getPurchasePitch() {
+        return (float) getConfig().getDouble("purchase-sound.pitch", 1.0);
     }
 
     public void updateCookiesPerClick(Player player, int cookiesPerClick) {
