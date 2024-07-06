@@ -6,6 +6,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -97,7 +98,8 @@ public class UpgradePagination implements Listener {
         Inventory inv = event.getClickedInventory();
         ItemStack clickedItem = event.getCurrentItem();
 
-        if (inv == null || clickedItem == null || !clickedItem.hasItemMeta()) return;
+        // Check if the click is within the upgrade inventory and not the player's own inventory
+        if (inv == null || clickedItem == null || !clickedItem.hasItemMeta() || inv.getType() != InventoryType.CHEST) return;
 
         String inventoryTitle = event.getView().getTitle();
         if (!inventoryTitle.contains("Cookie Upgrades - Page")) return;
@@ -117,9 +119,9 @@ public class UpgradePagination implements Listener {
                 openInventory(player, currentPage - 1);
             }
         } else if (clickedItem.getType() == Material.BARRIER && Objects.requireNonNull(clickedItem.getItemMeta()).getDisplayName().contains("Back to Main Menu")) {
-            // Open the GUI for upgrades
+            // Handle returning to the main menu
             player.closeInventory();
-            UpgradeGUI.openInventory(player);
+
         } else {
             // Handle upgrade item clicks
             for (Upgrade upgrade : plugin.loadUpgrades()) {

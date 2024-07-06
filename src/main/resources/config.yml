@@ -12,3 +12,7 @@ purchase-sound:
   sound: "ENTITY_PLAYER_LEVELUP"
   volume: 0.5
   pitch: 1.2
+
+
+# Todo: Remove synchronized
+# Todo: Fix buying a upgrade buys it multiple times

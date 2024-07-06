@@ -10,7 +10,7 @@ upgrades:
     cost: 200
     cookies-per-click: 4
   upgrade3:
-    name: "Upgrade 4"
+    name: "Upgrade 3"
     item: DIAMOND
     cost: 100
     cookies-per-click: 6

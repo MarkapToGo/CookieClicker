@@ -136,7 +136,7 @@ public final class CookieClicker extends JavaPlugin implements Listener {
     }
 
     // Method to load cookies per click for a player
-    public int loadCookiesPerClick(Player player) {
+    public synchronized int loadCookiesPerClick(Player player) {
         return cookiesPerClickMap.getOrDefault(player.getUniqueId(), 1); // Default to 1 if not found
     }
 
@@ -235,7 +235,7 @@ public final class CookieClicker extends JavaPlugin implements Listener {
         return (float) getConfig().getDouble("purchase-sound.pitch", 1.0);
     }
 
-    public void updateCookiesPerClick(Player player, int cookiesPerClick) {
+    public synchronized void updateCookiesPerClick(Player player, int cookiesPerClick) {
         // Update the map
         cookiesPerClickMap.put(player.getUniqueId(), cookiesPerClick);
         // Save to persistent storage
