@@ -22,8 +22,12 @@ public class ClickListener implements Listener {
 
     @EventHandler
     public void onPlayerUse(PlayerInteractEvent event) {
+        if (event.getClickedBlock() == null) {
+            return; // Exit the method if there's no block involved in the event
+        }
+
         Location clickerLocation = plugin.getClickerBlockLocation();
-        Location eventLocation = Objects.requireNonNull(event.getClickedBlock()).getLocation();
+        Location eventLocation = event.getClickedBlock().getLocation();
 
         if (Objects.equals(eventLocation.getWorld(), clickerLocation.getWorld()) &&
                 eventLocation.getBlockX() == clickerLocation.getBlockX() &&

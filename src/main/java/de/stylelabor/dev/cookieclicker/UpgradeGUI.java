@@ -58,9 +58,6 @@ public class UpgradeGUI implements Listener {
     }
 
 
-
-
-
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
         CookieClicker plugin = JavaPlugin.getPlugin(CookieClicker.class);
@@ -101,7 +98,7 @@ public class UpgradeGUI implements Listener {
                 meta.setDisplayName(upgrade.getName() + " - Cost: " + upgrade.getCost());
                 item.setItemMeta(meta);
             }
-            upgradeInv.setItem(9 + 2 + i, item); // Place in 3rd row, starting from 2nd slot
+            upgradeInv.setItem(18 + 2 + i, item); // Place in 3rd row, starting from 2nd slot
         }
 
 
