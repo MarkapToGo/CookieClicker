@@ -1,6 +1,7 @@
 package de.stylelabor.dev.cookieclicker;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -25,6 +26,31 @@ public class UpgradeGUI implements Listener {
 
         // Fetch the player's cookie count
         int cookies = plugin.loadCookies(player);
+        // Fetch the player's cookies per click and log the value
+        int cookiesPerClick = plugin.getCookiesPerClick(player);
+        plugin.getLogger().info("Fetched cookies per click for player " + player.getName() + ": " + cookiesPerClick);
+
+        // Create a red concrete block to display "Design"
+        ItemStack designItem = new ItemStack(Material.RED_CONCRETE);
+        ItemMeta designMeta = designItem.getItemMeta();
+        if (designMeta != null) {
+            designMeta.setDisplayName("Design");
+            designItem.setItemMeta(designMeta);
+        }
+
+        // Place the design item in the 4th row, middle slot
+        inv.setItem(31, designItem); // Inventory slots start at 0, so slot 31 is the 4th row, middle slot
+
+        // Create a yellow terracotta block to display the cookies per click
+        ItemStack cookiesPerClickItem = new ItemStack(Material.YELLOW_TERRACOTTA);
+        ItemMeta cookiesPerClickMeta = cookiesPerClickItem.getItemMeta();
+        if (cookiesPerClickMeta != null) {
+            cookiesPerClickMeta.setDisplayName("Cookies per Click: " + cookiesPerClick);
+            cookiesPerClickItem.setItemMeta(cookiesPerClickMeta);
+        }
+
+        // Place the cookies per click counter
+        inv.setItem(20, cookiesPerClickItem);
 
         // Create a brown concrete block to display the cookie count
         ItemStack cookieCounter = new ItemStack(Material.BROWN_CONCRETE);
@@ -47,7 +73,6 @@ public class UpgradeGUI implements Listener {
 
         // Place the upgrades item in the third row, 6th cell
         inv.setItem(24, upgradesItem);
-
 
         player.openInventory(inv);
 
@@ -125,17 +150,23 @@ public class UpgradeGUI implements Listener {
                 upgradeInv.setItem(17 + 2 + i, item); // Adjust the slot placement as needed
             }
 
-            // Fetch the player's cookies per click and current cookies
-            int cookiesPerClick = plugin.getCookiesPerClick(player);
+            // Fetch the latest cookies per click value for the player
+            int cookiesPerClick = plugin.loadCookiesPerClick(player);
+            plugin.getLogger().info("Displaying " + cookiesPerClick + " cookies per click for player " + player.getName());
+
             int currentCookies = plugin.loadCookies(player);
 
-            // Create an orange terracotta block to display cookies per click
-            ItemStack cookiesPerClickItem = new ItemStack(Material.ORANGE_TERRACOTTA);
+            // Create a yellow terracotta block to display the cookies per click
+            ItemStack cookiesPerClickItem = new ItemStack(Material.YELLOW_TERRACOTTA);
             ItemMeta cookiesPerClickMeta = cookiesPerClickItem.getItemMeta();
             if (cookiesPerClickMeta != null) {
-                cookiesPerClickMeta.setDisplayName("Cookies per Click: " + cookiesPerClick);
+                cookiesPerClickMeta.setDisplayName(ChatColor.GOLD + "Cookies per Click: " + cookiesPerClick);
                 cookiesPerClickItem.setItemMeta(cookiesPerClickMeta);
             }
+
+            // Place the cookies per click counter in the 3rd row, 3rd slot
+            upgradeInv.setItem(22, cookiesPerClickItem); // Inventory slots start at 0, so slot 22 is the 3rd row, 3rd slot
+
 
             // Create a brown terracotta block to display current cookies
             ItemStack currentCookiesItem = new ItemStack(Material.BROWN_TERRACOTTA);

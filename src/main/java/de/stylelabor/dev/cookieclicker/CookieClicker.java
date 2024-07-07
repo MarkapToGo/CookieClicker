@@ -219,16 +219,38 @@ public final class CookieClicker extends JavaPlugin implements Listener {
         }
     }
 
-
-
-
     public int getCookiesPerClick(Player player) {
-        File cookiesPerClickFile = new File(getDataFolder(), "cookies-per-click.yml");
-        if (!cookiesPerClickFile.exists()) {
-            return 1; // Return default value if file doesn't exist
+        // Check if the storage method is set to use MySQL
+        if (useMySQL()) {
+            // MySQL logic
+            try (Connection conn = MySQLUtil.getConnection(this);
+                 PreparedStatement ps = conn.prepareStatement("SELECT cookies_per_click FROM cookies_per_click WHERE uuid = ?")) {
+                ps.setString(1, player.getUniqueId().toString());
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        int cookiesPerClick = rs.getInt("cookies_per_click");
+                        getLogger().info("[Debug] Fetched " + cookiesPerClick + " cookiesPerClick for player: " + player.getUniqueId());
+                        return cookiesPerClick;
+                    }
+                }
+            } catch (SQLException e) {
+                getLogger().log(Level.SEVERE, "Could not load cookies per click from MySQL", e);
+            }
+            // Return default value if not found or error
+            getLogger().info("[Debug] Defaulting to 1 cookiesPerClick for player: " + player.getUniqueId() + " due to error or not found in MySQL.");
+            return 1;
+        } else {
+            // YAML logic
+            File cookiesPerClickFile = new File(getDataFolder(), "cookies-per-click.yml");
+            if (!cookiesPerClickFile.exists()) {
+                getLogger().info("[Debug] cookies-per-click.yml does not exist. Returning default value for player: " + player.getUniqueId());
+                return 1; // Return default value if file doesn't exist
+            }
+            FileConfiguration cookiesPerClickConfig = YamlConfiguration.loadConfiguration(cookiesPerClickFile);
+            int cookiesPerClick = cookiesPerClickConfig.getInt(player.getUniqueId().toString(), 1); // Default to 1 if not found
+            getLogger().info("[Debug] Fetched " + cookiesPerClick + " cookiesPerClick for player: " + player.getUniqueId());
+            return cookiesPerClick;
         }
-        FileConfiguration cookiesPerClickConfig = YamlConfiguration.loadConfiguration(cookiesPerClickFile);
-        return cookiesPerClickConfig.getInt(player.getUniqueId().toString(), 1); // Default to 1 if not found
     }
 
     // Method to save cookies to cookies.yml
@@ -314,7 +336,6 @@ public final class CookieClicker extends JavaPlugin implements Listener {
         // Save to persistent storage
         saveCookiesPerClick(player, cookiesPerClick);
     }
-
 
     @Override
     public void onDisable() {
