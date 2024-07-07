@@ -15,6 +15,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 
 public class UpgradeGUI implements Listener {
@@ -32,19 +33,8 @@ public class UpgradeGUI implements Listener {
         plugin.getLogger().info("Fetched current cookies for player " + player.getName() + ": " + currentCookies);
 
         // Fetch translated names for special items and replace placeholders
-        String cookiesItemName = plugin.getMessage("gui.current_cookies_item").replace("%current_cookies%", String.valueOf(currentCookies));
+        String cookiesItemName = plugin.getMessage("gui.current_cookies_item").replace("%current_cookies_point%", String.format(Locale.GERMAN, "%,d", currentCookies));
         String cookiesPerClickItemName = plugin.getMessage("gui.cookies_per_click_item").replace("%cookies_per_click%", String.valueOf(cookiesPerClick));
-
-        // Create a red concrete block to display "Design"
-        ItemStack designItem = new ItemStack(Material.RED_CONCRETE);
-        ItemMeta designMeta = designItem.getItemMeta();
-        if (designMeta != null) {
-            designMeta.setDisplayName("Design");
-            designItem.setItemMeta(designMeta);
-        }
-
-        // Place the design item in the 4th row, middle slot
-        inv.setItem(31, designItem); // Inventory slots start at 0, so slot 31 is the 4th row, middle slot
 
         // Create and add cookies per click item
         ItemStack cookiesPerClickItem = new ItemStack(Material.YELLOW_CONCRETE); // Assuming the material

@@ -5,6 +5,6 @@ messages:
 gui:
   upgrade_title: "§6§lCookie Upgrades"
   cookies_per_click_item: "&eCookies per Click: &6%cookies_per_click%"
-  current_cookies_item: "&6Current Cookies: &e%current_cookies%"
+  current_cookies_item: "&6Current Cookies: &e%current_cookies_point%"
 
 total_cookies_actionbar: "&6&lCookies: &b%total_cookies_point%"
