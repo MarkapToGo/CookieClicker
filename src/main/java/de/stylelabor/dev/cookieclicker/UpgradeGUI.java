@@ -132,12 +132,10 @@ public class UpgradeGUI implements Listener {
         int totalPages = (int) Math.ceil((double) upgrades.size() / UpgradePagination.getUpgradesPerPage());
 
         if (totalPages > 1) {
-            // If more than one page is needed, use UpgradePagination to handle it
             UpgradePagination pagination = new UpgradePagination(plugin);
-            pagination.openInventory(player, 0); // Open the first page
+            pagination.openInventory(player, 0);
         } else {
-            // If all upgrades fit on one page, use the existing logic to display them
-            Inventory upgradeInv = Bukkit.createInventory(null, 45, "Cookie Upgrades"); // 5 rows x 9 slots = 45 slots
+            Inventory upgradeInv = Bukkit.createInventory(null, 45, ChatColor.translateAlternateColorCodes('&', plugin.getGUITitle("upgrade_title", "Cookie Upgrades")));
 
             for (int i = 0; i < upgrades.size(); i++) {
                 Upgrade upgrade = upgrades.get(i);
@@ -147,39 +145,32 @@ public class UpgradeGUI implements Listener {
                     meta.setDisplayName(upgrade.getName() + " - Cost: " + upgrade.getCost());
                     item.setItemMeta(meta);
                 }
-                upgradeInv.setItem(17 + 2 + i, item); // Adjust the slot placement as needed
+                upgradeInv.setItem(17 + 2 + i, item);
             }
 
-            // Fetch the latest cookies per click value for the player
             int cookiesPerClick = plugin.loadCookiesPerClick(player);
-            plugin.getLogger().info("Displaying " + cookiesPerClick + " cookies per click for player " + player.getName());
-
             int currentCookies = plugin.loadCookies(player);
 
-            // Create a yellow terracotta block to display the cookies per click
+            String cookiesPerClickItemName = ChatColor.translateAlternateColorCodes('&', plugin.getMessage("gui.cookies_per_click_item").replace("%cookies_per_click%", String.valueOf(cookiesPerClick)));
             ItemStack cookiesPerClickItem = new ItemStack(Material.YELLOW_TERRACOTTA);
             ItemMeta cookiesPerClickMeta = cookiesPerClickItem.getItemMeta();
             if (cookiesPerClickMeta != null) {
-                cookiesPerClickMeta.setDisplayName(ChatColor.GOLD + "Cookies per Click: " + cookiesPerClick);
+                cookiesPerClickMeta.setDisplayName(cookiesPerClickItemName);
                 cookiesPerClickItem.setItemMeta(cookiesPerClickMeta);
             }
+            upgradeInv.setItem(22, cookiesPerClickItem);
 
-            // Place the cookies per click counter in the 3rd row, 3rd slot
-            upgradeInv.setItem(22, cookiesPerClickItem); // Inventory slots start at 0, so slot 22 is the 3rd row, 3rd slot
-
-
-            // Create a brown terracotta block to display current cookies
+            String currentCookiesItemName = ChatColor.translateAlternateColorCodes('&', plugin.getMessage("gui.current_cookies_item").replace("%current_cookies%", String.valueOf(currentCookies)));
             ItemStack currentCookiesItem = new ItemStack(Material.BROWN_TERRACOTTA);
             ItemMeta currentCookiesMeta = currentCookiesItem.getItemMeta();
             if (currentCookiesMeta != null) {
-                currentCookiesMeta.setDisplayName("Current Cookies: " + currentCookies);
+                currentCookiesMeta.setDisplayName(currentCookiesItemName);
                 currentCookiesItem.setItemMeta(currentCookiesMeta);
             }
+            upgradeInv.setItem(6, currentCookiesItem);
 
-            // Place the items in the specified slots
-            upgradeInv.setItem(2, cookiesPerClickItem); // 3rd slot (index 2)
-            upgradeInv.setItem(6, currentCookiesItem); // 7th slot (index 6)
             player.openInventory(upgradeInv);
         }
+    }
 
-    }}
+}

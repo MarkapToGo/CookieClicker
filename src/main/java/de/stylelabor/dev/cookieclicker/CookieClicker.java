@@ -50,6 +50,9 @@ public final class CookieClicker extends JavaPlugin implements Listener {
         // Ensure config.yml is generated if it does not exist
         saveDefaultConfig();
 
+        // Load language.yml configuration on plugin enable
+        loadLanguageConfig();
+
         // Load upgrades
         getServer().getPluginManager().registerEvents(new UpgradeGUI(), this);
 
@@ -89,6 +92,8 @@ public final class CookieClicker extends JavaPlugin implements Listener {
         return upgradeManager;
     }
 
+
+
     private void setupUpgradesConfig() {
         File upgradesFile = new File(getDataFolder(), "upgrades.yml");
         if (!upgradesFile.exists()) {
@@ -122,8 +127,19 @@ public final class CookieClicker extends JavaPlugin implements Listener {
         return upgrades;
     }
 
-    public String getLanguageMessage(String path, String defaultValue) {
-        return languageConfig.getString("messages." + path, defaultValue);
+    private void loadLanguageConfig() {
+        File languageFile = new File(getDataFolder(), "language.yml");
+        if (!languageFile.exists()) {
+            saveResource("language.yml", false);
+        }
+        languageConfig = YamlConfiguration.loadConfiguration(languageFile);
+    }
+
+    public String getMessage(String key) {
+        // Retrieve the message using the key from language.yml
+        String message = languageConfig.getString(key, "Message not found for key: " + key);
+        // Translate color codes and return the message
+        return ChatColor.translateAlternateColorCodes('&', message);
     }
 
     public int loadCookies(Player player) {

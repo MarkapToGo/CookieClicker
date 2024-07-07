@@ -81,7 +81,14 @@ public class UpgradePagination implements Listener {
     }
 
     private ItemStack createNavItem(String name) {
-        ItemStack item = new ItemStack(Material.ARROW);
+        Material material;
+        if ("Back to Main Menu".equals(name)) {
+            material = Material.BARRIER;
+        } else {
+            material = Material.ARROW;
+        }
+
+        ItemStack item = new ItemStack(material);
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
             meta.setDisplayName(name);
@@ -120,7 +127,8 @@ public class UpgradePagination implements Listener {
             }
         } else if (clickedItem.getType() == Material.BARRIER && Objects.requireNonNull(clickedItem.getItemMeta()).getDisplayName().contains("Back to Main Menu")) {
             // Handle returning to the main menu
-            player.closeInventory();
+            // player.closeInventory();
+            UpgradeGUI.openInventory(player);
 
         } else {
             // Handle upgrade item clicks

@@ -19,18 +19,18 @@ public class MySQLUtil {
                 String url = "jdbc:mysql://" + host + ":" + port + "/?useSSL=false";
 
                 // Log before attempting to connect
-                plugin.getLogger().info("Attempting to connect to MySQL server at " + url);
+                // plugin.getLogger().info("Attempting to connect to MySQL server at " + url);
                 connection = DriverManager.getConnection(url, username, password);
                 // Log success of connection
-                plugin.getLogger().info("Successfully connected to MySQL server.");
+                // plugin.getLogger().info("Successfully connected to MySQL server.");
 
                 // Create database if it doesn't exist
                 try (Statement statement = connection.createStatement()) {
                     // Log before attempting to create the database
-                    plugin.getLogger().info("Attempting to create the database if it doesn't exist.");
+                    // plugin.getLogger().info("Attempting to create the database if it doesn't exist.");
                     statement.executeUpdate("CREATE DATABASE IF NOT EXISTS `" + database + "`");
                     // Log success of database creation
-                    plugin.getLogger().info("Database checked/created successfully.");
+                    // plugin.getLogger().info("Database checked/created successfully.");
                 }
 
                 // Close the connection to reconnect with the database specified
@@ -39,10 +39,10 @@ public class MySQLUtil {
                 // Reconnect with the database specified
                 url = "jdbc:mysql://" + host + ":" + port + "/" + database + "?useSSL=false";
                 // Log before attempting to reconnect
-                plugin.getLogger().info("Reconnecting with the database specified.");
+                // plugin.getLogger().info("Reconnecting with the database specified.");
                 connection = DriverManager.getConnection(url, username, password);
                 // Log success of reconnection
-                plugin.getLogger().info("Successfully reconnected with the specified database.");
+                // plugin.getLogger().info("Successfully reconnected with the specified database.");
 
                 // Create tables if they don't exist
                 try (Statement statement = connection.createStatement()) {
@@ -58,7 +58,7 @@ public class MySQLUtil {
                             "cookies_per_click INT NOT NULL," +
                             "PRIMARY KEY (uuid))");
                     // Log success of table creation
-                    plugin.getLogger().info("Tables checked/created successfully.");
+                    // plugin.getLogger().info("Tables checked/created successfully.");
                 }
             }
         } catch (SQLException e) {
