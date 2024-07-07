@@ -93,6 +93,34 @@ public final class CookieClicker extends JavaPlugin implements Listener {
     }
 
 
+    public int getCurrentCookies(Player player) {
+        if (useMySQL()) {
+            // MySQL logic
+            try (Connection conn = MySQLUtil.getConnection(this);
+                 PreparedStatement ps = conn.prepareStatement("SELECT cookies FROM player_cookies WHERE uuid = ?")) {
+                ps.setString(1, player.getUniqueId().toString());
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        return rs.getInt("cookies");
+                    }
+                }
+            } catch (SQLException e) {
+                getLogger().log(Level.SEVERE, "Could not load current cookies from MySQL", e);
+            }
+            // Return default value if not found or error
+            getLogger().info("[Debug] Defaulting to 0 currentCookies for player: " + player.getUniqueId() + " due to error or not found in MySQL.");
+            return 0;
+        } else {
+            // YAML logic
+            File cookiesFile = new File(getDataFolder(), "cookies.yml");
+            if (!cookiesFile.exists()) {
+                getLogger().info("[Debug] cookies.yml does not exist. Returning default value for player: " + player.getUniqueId());
+                return 0; // Return default value if file doesn't exist
+            }
+            FileConfiguration cookiesConfig = YamlConfiguration.loadConfiguration(cookiesFile);
+            return cookiesConfig.getInt(player.getUniqueId().toString(), 0); // Default to 0 if not found
+        }
+    }
 
     private void setupUpgradesConfig() {
         File upgradesFile = new File(getDataFolder(), "upgrades.yml");
@@ -127,19 +155,20 @@ public final class CookieClicker extends JavaPlugin implements Listener {
         return upgrades;
     }
 
+    public String getMessage(String key) {
+        if (languageConfig == null) {
+            loadLanguageConfig();
+        }
+        String message = languageConfig.getString(key, "Key not found: " + key);
+        return ChatColor.translateAlternateColorCodes('&', message);
+    }
+
     private void loadLanguageConfig() {
         File languageFile = new File(getDataFolder(), "language.yml");
         if (!languageFile.exists()) {
             saveResource("language.yml", false);
         }
         languageConfig = YamlConfiguration.loadConfiguration(languageFile);
-    }
-
-    public String getMessage(String key) {
-        // Retrieve the message using the key from language.yml
-        String message = languageConfig.getString(key, "Message not found for key: " + key);
-        // Translate color codes and return the message
-        return ChatColor.translateAlternateColorCodes('&', message);
     }
 
     public int loadCookies(Player player) {

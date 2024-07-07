@@ -24,11 +24,17 @@ public class UpgradeGUI implements Listener {
         String guiTitle = plugin.getGUITitle("upgrade_title", "Cookie Upgrades");
         Inventory inv = Bukkit.createInventory(null, 45, guiTitle); // Use the fetched title
 
-        // Fetch the player's cookie count
-        int cookies = plugin.loadCookies(player);
-        // Fetch the player's cookies per click and log the value
+        // Fetch the player's cookies per click and current cookies
         int cookiesPerClick = plugin.getCookiesPerClick(player);
+        int currentCookies = plugin.getCurrentCookies(player); // Assuming there's a method to fetch current cookies
+
         plugin.getLogger().info("Fetched cookies per click for player " + player.getName() + ": " + cookiesPerClick);
+        plugin.getLogger().info("Fetched current cookies for player " + player.getName() + ": " + currentCookies);
+
+        // Fetch translated names for special items and replace placeholders
+        String cookiesItemName = plugin.getMessage("gui.current_cookies_item").replace("%current_cookies%", String.valueOf(currentCookies));
+        String cookiesPerClickItemName = plugin.getMessage("gui.cookies_per_click_item").replace("%cookies_per_click%", String.valueOf(cookiesPerClick));
+
 
         // Create a red concrete block to display "Design"
         ItemStack designItem = new ItemStack(Material.RED_CONCRETE);
@@ -41,27 +47,23 @@ public class UpgradeGUI implements Listener {
         // Place the design item in the 4th row, middle slot
         inv.setItem(31, designItem); // Inventory slots start at 0, so slot 31 is the 4th row, middle slot
 
-        // Create a yellow terracotta block to display the cookies per click
-        ItemStack cookiesPerClickItem = new ItemStack(Material.YELLOW_TERRACOTTA);
+        // Create and add cookies per click item
+        ItemStack cookiesPerClickItem = new ItemStack(Material.YELLOW_CONCRETE); // Assuming the material
         ItemMeta cookiesPerClickMeta = cookiesPerClickItem.getItemMeta();
         if (cookiesPerClickMeta != null) {
-            cookiesPerClickMeta.setDisplayName("Cookies per Click: " + cookiesPerClick);
+            cookiesPerClickMeta.setDisplayName(cookiesPerClickItemName);
             cookiesPerClickItem.setItemMeta(cookiesPerClickMeta);
         }
-
-        // Place the cookies per click counter
         inv.setItem(20, cookiesPerClickItem);
 
-        // Create a brown concrete block to display the cookie count
-        ItemStack cookieCounter = new ItemStack(Material.BROWN_CONCRETE);
-        ItemMeta meta = cookieCounter.getItemMeta();
-        if (meta != null) {
-            meta.setDisplayName("Cookies: " + cookies);
-            cookieCounter.setItemMeta(meta);
+        // Create and add cookies item
+        ItemStack cookiesItem = new ItemStack(Material.BROWN_DYE); // Assuming the material
+        ItemMeta cookiesMeta = cookiesItem.getItemMeta();
+        if (cookiesMeta != null) {
+            cookiesMeta.setDisplayName(cookiesItemName);
+            cookiesItem.setItemMeta(cookiesMeta);
         }
-
-        // Place the cookie counter in the middle of the second row
-        inv.setItem(13, cookieCounter);
+        inv.setItem(13, cookiesItem);
 
         // Create a green concrete block called "Upgrades!"
         ItemStack upgradesItem = new ItemStack(Material.GREEN_CONCRETE);

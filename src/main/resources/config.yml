@@ -1,7 +1,7 @@
 click-sound:
   sound: BLOCK_NOTE_BLOCK_PLING
-  volume: 0.4
-  pitch: 1.0
+  volume: 0.3
+  pitch: 0.9
 
 gui_open_sound:
   sound: "BLOCK_BARREL_OPEN"
@@ -24,7 +24,6 @@ mysql:
   password: '131219'
 
 # Todo: Remove synchronized
-# Todo: Fix buying a upgrade buys it multiple times
 # Todo: Remove clicker
 
 
