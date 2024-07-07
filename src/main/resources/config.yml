@@ -13,6 +13,19 @@ purchase-sound:
   volume: 0.5
   pitch: 1.2
 
+# MySQL configuration section
+storage:
+  type: 'MYSQL' # Change to 'MySQL' to use MySQL
+mysql:
+  host: 'localhost'
+  port: 3306
+  database: 'cookieclicker'
+  username: 'root'
+  password: '131219'
 
 # Todo: Remove synchronized
 # Todo: Fix buying a upgrade buys it multiple times
+# Todo: Remove clicker
+
+
+

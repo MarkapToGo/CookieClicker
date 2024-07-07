@@ -45,8 +45,8 @@ public class UpgradeGUI implements Listener {
             upgradesItem.setItemMeta(upgradesMeta);
         }
 
-        // Place the upgrades item in the third row, 7th cell
-        inv.setItem(25, upgradesItem);
+        // Place the upgrades item in the third row, 6th cell
+        inv.setItem(24, upgradesItem);
 
 
         player.openInventory(inv);

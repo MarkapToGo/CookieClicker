@@ -9,6 +9,10 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.plugin.java.JavaPlugin;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 import java.io.File;
 import java.io.IOException;
@@ -25,6 +29,21 @@ public final class CookieClicker extends JavaPlugin implements Listener {
 
     @Override
     public void onEnable() {
+
+        // Display startup message
+        String[] startupMessage = {
+                "############################",
+                "##                        ##",
+                "##    CookieClicker 🍪    ##",
+                "##    coded by Markap     ##",
+                "##                        ##",
+                "############################"
+        };
+
+        for (String line : startupMessage) {
+            getLogger().info(line);
+        }
+
         // Setup locations config
         setupLocationsConfig();
 
@@ -79,6 +98,11 @@ public final class CookieClicker extends JavaPlugin implements Listener {
         getLogger().info("Upgrades config setup completed.");
     }
 
+    // Method to determine the storage type
+    public boolean useMySQL() {
+        return "MYSQL".equalsIgnoreCase(this.getConfig().getString("storage.type"));
+    }
+
     public List<Upgrade> loadUpgrades() {
         List<Upgrade> upgrades = new ArrayList<>();
         ConfigurationSection upgradesSection = upgradesConfig.getConfigurationSection("upgrades");
@@ -98,9 +122,31 @@ public final class CookieClicker extends JavaPlugin implements Listener {
         return upgrades;
     }
 
-
     public String getLanguageMessage(String path, String defaultValue) {
         return languageConfig.getString("messages." + path, defaultValue);
+    }
+
+    public int loadCookies(Player player) {
+        if (useMySQL()) {
+            // MySQL logic
+            try (Connection conn = MySQLUtil.getConnection(this);
+                 PreparedStatement ps = Objects.requireNonNull(conn).prepareStatement("SELECT cookies FROM player_cookies WHERE uuid = ?")) {
+                ps.setString(1, player.getUniqueId().toString());
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        return rs.getInt("cookies");
+                    }
+                }
+            } catch (SQLException e) {
+                getLogger().log(Level.SEVERE, "Could not load cookies from MySQL", e);
+            }
+            return 0; // Default to 0 if not found or error
+        } else {
+            // YAML logic
+            File cookiesFile = new File(getDataFolder(), "cookies.yml");
+            FileConfiguration cookiesConfig = YamlConfiguration.loadConfiguration(cookiesFile);
+            return cookiesConfig.getInt(player.getUniqueId().toString(), 0); // Default to 0 if not found
+        }
     }
 
     public void loadCookiesPerClickFromStorage() {
@@ -116,51 +162,65 @@ public final class CookieClicker extends JavaPlugin implements Listener {
         }
     }
 
-    // Method to load cookies from cookies.yml with error handling for file creation
-    public int loadCookies(Player player) {
-        File cookiesFile = new File(getDataFolder(), "cookies.yml");
-        if (!cookiesFile.exists()) {
-            try {
-                boolean fileCreated = cookiesFile.createNewFile();
-                if (!fileCreated) {
-                    getLogger().severe("Failed to create cookies.yml");
-                    return 0; // Or handle this case as appropriate for your application
-                }
-            } catch (IOException e) {
-                getLogger().log(Level.SEVERE, "Could not create cookies.yml", e);
-                return 0; // Or handle this case as appropriate for your application
-            }
-        }
-        FileConfiguration cookiesConfig = YamlConfiguration.loadConfiguration(cookiesFile);
-        return cookiesConfig.getInt(player.getUniqueId().toString(), 0); // Default to 0 if not found
-    }
-
     // Method to load cookies per click for a player
     public synchronized int loadCookiesPerClick(Player player) {
-        return cookiesPerClickMap.getOrDefault(player.getUniqueId(), 1); // Default to 1 if not found
+        if (useMySQL()) {
+            // MySQL logic
+            try (Connection conn = MySQLUtil.getConnection(this);
+                 PreparedStatement ps = Objects.requireNonNull(conn).prepareStatement("SELECT cookies_per_click FROM cookies_per_click WHERE uuid = ?")) {
+                ps.setString(1, player.getUniqueId().toString());
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        return rs.getInt("cookies_per_click");
+                    }
+                }
+            } catch (SQLException e) {
+                getLogger().log(Level.SEVERE, "Could not load cookies per click from MySQL", e);
+            }
+            return 1; // Default to 1 if not found or error
+        } else {
+            // YAML logic
+            return cookiesPerClickMap.getOrDefault(player.getUniqueId(), 1); // Default to 1 if not found
+        }
     }
 
     public void saveCookiesPerClick(Player player, int cookiesPerClick) {
-        File cookiesPerClickFile = new File(getDataFolder(), "cookies-per-click.yml");
-        if (!cookiesPerClickFile.exists()) {
-            try {
-                if (!cookiesPerClickFile.createNewFile()) {
-                    getLogger().warning("Failed to create cookies-per-click.yml as it already exists.");
+        if (useMySQL()) {
+            // MySQL logic
+            try (Connection conn = MySQLUtil.getConnection(this);
+                 PreparedStatement ps = Objects.requireNonNull(conn).prepareStatement("REPLACE INTO cookies_per_click (uuid, cookies_per_click) VALUES (?, ?)")) {
+                ps.setString(1, player.getUniqueId().toString());
+                ps.setInt(2, cookiesPerClick);
+                ps.executeUpdate();
+            } catch (SQLException e) {
+                getLogger().log(Level.SEVERE, "Could not save cookies per click to MySQL", e);
+            }
+        } else {
+            // YAML logic
+            File cookiesPerClickFile = new File(getDataFolder(), "cookies-per-click.yml");
+            if (!cookiesPerClickFile.exists()) {
+                try {
+                    if (!cookiesPerClickFile.createNewFile()) {
+                        getLogger().warning("Failed to create cookies-per-click.yml as it already exists.");
+                    }
+                } catch (IOException e) {
+                    getLogger().log(Level.SEVERE, "Could not create cookies-per-click.yml", e);
+                    return;
                 }
+            }
+            FileConfiguration cookiesPerClickConfig = YamlConfiguration.loadConfiguration(cookiesPerClickFile);
+            cookiesPerClickConfig.set(player.getUniqueId().toString(), cookiesPerClick);
+            try {
+                cookiesPerClickConfig.save(cookiesPerClickFile);
+                getLogger().info("Successfully saved " + cookiesPerClick + " cookiesPerClick for player " + player.getUniqueId() + " to cookies-per-click.yml");
             } catch (IOException e) {
-                getLogger().log(Level.SEVERE, "Could not create cookies-per-click.yml", e);
-                return;
+                getLogger().log(Level.SEVERE, "Could not save cookiesPerClick to cookies-per-click.yml", e);
             }
         }
-        FileConfiguration cookiesPerClickConfig = YamlConfiguration.loadConfiguration(cookiesPerClickFile);
-        cookiesPerClickConfig.set(player.getUniqueId().toString(), cookiesPerClick);
-        try {
-            cookiesPerClickConfig.save(cookiesPerClickFile);
-            getLogger().info("Successfully saved " + cookiesPerClick + " cookiesPerClick for player " + player.getUniqueId() + " to cookies-per-click.yml");
-        } catch (IOException e) {
-            getLogger().log(Level.SEVERE, "Could not save cookiesPerClick to cookies-per-click.yml", e);
-        }
     }
+
+
+
 
     public int getCookiesPerClick(Player player) {
         File cookiesPerClickFile = new File(getDataFolder(), "cookies-per-click.yml");
@@ -173,13 +233,26 @@ public final class CookieClicker extends JavaPlugin implements Listener {
 
     // Method to save cookies to cookies.yml
     public void saveCookies(Player player, int cookies) {
-        File cookiesFile = new File(getDataFolder(), "cookies.yml");
-        FileConfiguration cookiesConfig = YamlConfiguration.loadConfiguration(cookiesFile);
-        cookiesConfig.set(player.getUniqueId().toString(), cookies);
-        try {
-            cookiesConfig.save(cookiesFile);
-        } catch (IOException e) {
-            getLogger().log(Level.SEVERE, "Could not save cookies to cookies.yml", e);
+        if (useMySQL()) {
+            // MySQL logic
+            try (Connection conn = MySQLUtil.getConnection(this);
+                 PreparedStatement ps = Objects.requireNonNull(conn).prepareStatement("REPLACE INTO player_cookies (uuid, cookies) VALUES (?, ?)")) {
+                ps.setString(1, player.getUniqueId().toString());
+                ps.setInt(2, cookies);
+                ps.executeUpdate();
+            } catch (SQLException e) {
+                getLogger().log(Level.SEVERE, "Could not save cookies to MySQL", e);
+            }
+        } else {
+            // YAML logic
+            File cookiesFile = new File(getDataFolder(), "cookies.yml");
+            FileConfiguration cookiesConfig = YamlConfiguration.loadConfiguration(cookiesFile);
+            cookiesConfig.set(player.getUniqueId().toString(), cookies);
+            try {
+                cookiesConfig.save(cookiesFile);
+            } catch (IOException e) {
+                getLogger().log(Level.SEVERE, "Could not save cookies to cookies.yml", e);
+            }
         }
     }
 
