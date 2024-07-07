@@ -59,6 +59,7 @@ public class UpgradePagination implements Listener {
         player.openInventory(inv);
     }
 
+    @SuppressWarnings("ConstantValue")
     private int calculateSlotIndex(int i) {
         int row = i / 7; // Calculate row number based on index, 7 items per row
         int slotInRow = i % 7; // Calculate the position in the row
