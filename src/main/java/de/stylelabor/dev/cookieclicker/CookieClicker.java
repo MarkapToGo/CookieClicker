@@ -1,5 +1,7 @@
 package de.stylelabor.dev.cookieclicker;
 
+import net.md_5.bungee.api.ChatMessageType;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.*;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -9,18 +11,17 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import java.io.File;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-
-import java.io.File;
-import java.io.IOException;
 import java.util.*;
 import java.util.logging.Level;
 
 public final class CookieClicker extends JavaPlugin implements Listener {
-
 
     private FileConfiguration languageConfig;
     private FileConfiguration upgradesConfig;
@@ -92,6 +93,13 @@ public final class CookieClicker extends JavaPlugin implements Listener {
         return upgradeManager;
     }
 
+    public void showTotalCookiesInActionBar(Player player) {
+        int totalCookies = getCurrentCookies(player); // Assuming this method exists and returns the total cookies for the player
+        String messageTemplate = languageConfig.getString("total_cookies_actionbar", "Total Cookies: %total_cookies%");
+        String messageWithCookies = messageTemplate.replace("%total_cookies_point%", String.format(Locale.GERMAN, "%,d", totalCookies));
+        String coloredMessage = ChatColor.translateAlternateColorCodes('&', messageWithCookies);
+        player.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(coloredMessage));
+    }
 
     public int getCurrentCookies(Player player) {
         if (useMySQL()) {

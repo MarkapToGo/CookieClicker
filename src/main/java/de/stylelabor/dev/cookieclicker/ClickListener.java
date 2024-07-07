@@ -1,7 +1,5 @@
 package de.stylelabor.dev.cookieclicker;
 
-import net.md_5.bungee.api.ChatMessageType;
-import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.event.EventHandler;
@@ -20,6 +18,7 @@ public class ClickListener implements Listener {
         this.plugin = plugin;
     }
 
+    // Inside the ClickListener class
 
     @EventHandler
     public void onPlayerUse(PlayerInteractEvent event) {
@@ -44,9 +43,8 @@ public class ClickListener implements Listener {
                 int cookies = plugin.loadCookies(event.getPlayer()) + cookiesPerClick; // Increment cookies by cookies per click
                 plugin.saveCookies(event.getPlayer(), cookies); // Save new cookie count
 
-                // Send action bar message
-                event.getPlayer().spigot().sendMessage(ChatMessageType.ACTION_BAR,
-                        new TextComponent("Cookies - " + cookies));
+                // Correctly get the player from the event and show total cookies in action bar using the plugin instance
+                plugin.showTotalCookiesInActionBar(event.getPlayer());
 
                 // Play sound
                 String soundName = plugin.getConfig().getString("click-sound.sound", "BLOCK_NOTE_BLOCK_PLING");

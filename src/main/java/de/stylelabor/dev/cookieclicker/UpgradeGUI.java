@@ -35,7 +35,6 @@ public class UpgradeGUI implements Listener {
         String cookiesItemName = plugin.getMessage("gui.current_cookies_item").replace("%current_cookies%", String.valueOf(currentCookies));
         String cookiesPerClickItemName = plugin.getMessage("gui.cookies_per_click_item").replace("%cookies_per_click%", String.valueOf(cookiesPerClick));
 
-
         // Create a red concrete block to display "Design"
         ItemStack designItem = new ItemStack(Material.RED_CONCRETE);
         ItemMeta designMeta = designItem.getItemMeta();
@@ -85,28 +84,25 @@ public class UpgradeGUI implements Listener {
         player.playSound(player.getLocation(), Sound.valueOf(soundName), volume, pitch);
     }
 
-
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
         CookieClicker plugin = JavaPlugin.getPlugin(CookieClicker.class);
         String guiTitle = plugin.getGUITitle("upgrade_title", "Cookie Upgrades");
         if (event.getView().getTitle().equals(guiTitle)) {
-            event.setCancelled(true); // Prevent any inventory action
+            event.setCancelled(true);
 
             ItemStack clickedItem = event.getCurrentItem();
             if (clickedItem != null && clickedItem.hasItemMeta() && Objects.requireNonNull(clickedItem.getItemMeta()).hasDisplayName()) {
-                List<Upgrade> upgrades = plugin.loadUpgrades();
                 Player player = (Player) event.getWhoClicked();
 
+                List<Upgrade> upgrades = plugin.loadUpgrades();
                 for (Upgrade upgrade : upgrades) {
                     if (clickedItem.getType() == upgrade.getItem() && clickedItem.getItemMeta().getDisplayName().contains(upgrade.getName())) {
                         UpgradeManager upgradeManager = new UpgradeManager(plugin);
                         if (upgradeManager.canAffordUpgrade(player, upgrade)) {
                             upgradeManager.processUpgradePurchase(player, upgrade);
-                            // player.closeInventory(); // Close the inventory after purchase
-                            // openUpgradeGUI(player, plugin); // Re-open the inventory to reflect changes
                         } else {
-                            player.sendMessage("You do not have enough cookies to purchase this upgrade.");
+                            player.sendMessage(ChatColor.RED + "You do not have enough cookies to purchase this upgrade.");
                         }
                         return; // Exit the method after handling the upgrade item
                     }
@@ -129,7 +125,7 @@ public class UpgradeGUI implements Listener {
         }
     }
 
-    public void openUpgradeGUI(Player player, CookieClicker plugin) {
+    public static void openUpgradeGUI(Player player, CookieClicker plugin) {
         List<Upgrade> upgrades = JavaPlugin.getPlugin(CookieClicker.class).loadUpgrades();
         int totalPages = (int) Math.ceil((double) upgrades.size() / UpgradePagination.getUpgradesPerPage());
 
@@ -170,9 +166,7 @@ public class UpgradeGUI implements Listener {
                 currentCookiesItem.setItemMeta(currentCookiesMeta);
             }
             upgradeInv.setItem(6, currentCookiesItem);
-
             player.openInventory(upgradeInv);
         }
     }
-
 }
