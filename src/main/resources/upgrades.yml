@@ -1,46 +1,81 @@
 upgrades:
   upgrade1:
-    name: "Upgrade 1"
+    name: "&6&lUpgrade 1"
     item: PRISMARINE_SHARD
     cost: 20
     cookies-per-click: 2
+    lore:
+      - "&eCost: &6%cookies_cost%"
+      - "&eCookies per Click: &a+ &6%cookies-per-click-gain%"
   upgrade2:
-    name: "Upgrade 2"
+    name: "&6&lUpgrade 2"
     item: SUNFLOWER
     cost: 200
     cookies-per-click: 4
+    lore:
+      - "&eCost: &6%cookies_cost%"
+      - "&eCookies per Click: &a+ &6%cookies-per-click-gain%"
   upgrade3:
-    name: "Upgrade 3"
+    name: "&6&lUpgrade 3"
     item: SNOWBALL
-    cost: 100
+    cost: 500
     cookies-per-click: 6
+    lore:
+      - "&eCost: &6%cookies_cost%"
+      - "&eCookies per Click: &a+ &6%cookies-per-click-gain%"
   upgrade4:
-    name: "Upgrade 4"
+    name: "&6&lUpgrade 4"
     item: GOLD_INGOT
     cost: 1000
     cookies-per-click: 20
+    lore:
+      - "&eCost: &6%cookies_cost%"
+      - "&eCookies per Click: &a+ &6%cookies-per-click-gain%"
   upgrade5:
-    name: "Upgrade 5"
+    name: "&6&lUpgrade 5"
     item: DIAMOND
     cost: 5000
     cookies-per-click: 50
+    lore:
+      - "&eCost: &6%cookies_cost%"
+      - "&eCookies per Click: &a+ &6%cookies-per-click-gain%"
   upgrade6:
-    name: "Upgrade 6"
+    name: "&6&lUpgrade 6"
     item: EMERALD
-    cost: 90000
+    cost: 10000
     cookies-per-click: 100
+    lore:
+      - "&eCost: &6%cookies_cost%"
+      - "&eCookies per Click: &a+ &6%cookies-per-click-gain%"
   upgrade7:
-    name: "Upgrade 7"
+    name: "&6&lUpgrade 7"
     item: NAUTILUS_SHELL
-    cost: 900000
-    cookies-per-click: 300
+    cost: 25000
+    cookies-per-click: 200
+    lore:
+      - "&eCost: &6%cookies_cost%"
+      - "&eCookies per Click: &a+ &6%cookies-per-click-gain%"
   upgrade8:
-    name: "Upgrade 8"
+    name: "&6&lUpgrade 8"
     item: POPPED_CHORUS_FRUIT
-    cost: 2000000
-    cookies-per-click: 1000
+    cost: 100000
+    cookies-per-click: 450
+    lore:
+      - "&eCost: &6%cookies_cost%"
+      - "&eCookies per Click: &a+ &6%cookies-per-click-gain%"
   upgrade9:
-    name: "Upgrade 9"
+    name: "&6&lUpgrade 9"
     item: GLOWSTONE_DUST
-    cost: 5000000
-    cookies-per-click: 2000
+    cost: 600000
+    cookies-per-click: 700
+    lore:
+      - "&eCost: &6%cookies_cost%"
+      - "&eCookies per Click: &a+ &6%cookies-per-click-gain%"
+  upgrade10:
+    name: "&6&lUpgrade 9"
+    item: GLOWSTONE_BLOCK
+    cost: 1000000
+    cookies-per-click: 1000
+    lore:
+      - "&eCost: &6%cookies_cost%"
+      - "&eCookies per Click: &a+ &6%cookies-per-click-gain%"
