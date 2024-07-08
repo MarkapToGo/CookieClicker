@@ -38,7 +38,7 @@ public class CookieClickerCommand implements CommandExecutor {
                 locationsConfig.set("clicker.location.z", blockLocation.getZ());
                 try {
                     locationsConfig.save(locationsFile);
-                    player.sendMessage("Clicker block set!");
+                    player.sendMessage("Clicker block set! You can change it in the locations.yml!");
 
                 } catch (IOException e) {
                     plugin.getLogger().log(Level.SEVERE, "Could not save clicker block location to locations.yml", e);

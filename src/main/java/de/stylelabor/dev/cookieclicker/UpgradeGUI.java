@@ -32,13 +32,13 @@ public class UpgradeGUI implements Listener {
         String cookiesPerClickItemName = plugin.getMessage("gui.cookies_per_click_item").replace("%cookies_per_click%", String.format(Locale.GERMAN, "%,d", cookiesPerClick));
 
         // Create and add cookies per click item
-        ItemStack cookiesPerClickItem = new ItemStack(Material.YELLOW_CONCRETE); // Assuming the material
+        ItemStack cookiesPerClickItem = new ItemStack(Material.YELLOW_DYE); // Assuming the material
         ItemMeta cookiesPerClickMeta = cookiesPerClickItem.getItemMeta();
         if (cookiesPerClickMeta != null) {
             cookiesPerClickMeta.setDisplayName(cookiesPerClickItemName);
             cookiesPerClickItem.setItemMeta(cookiesPerClickMeta);
         }
-        inv.setItem(20, cookiesPerClickItem);
+        inv.setItem(14, cookiesPerClickItem);
 
         // Create and add cookies item
         ItemStack cookiesItem = new ItemStack(Material.BROWN_DYE); // Assuming the material
@@ -47,7 +47,7 @@ public class UpgradeGUI implements Listener {
             cookiesMeta.setDisplayName(cookiesItemName);
             cookiesItem.setItemMeta(cookiesMeta);
         }
-        inv.setItem(13, cookiesItem);
+        inv.setItem(12, cookiesItem);
 
         // Create a green concrete block called "Upgrades!"
         ItemStack upgradesItem = new ItemStack(Material.GREEN_CONCRETE);
@@ -72,7 +72,6 @@ public class UpgradeGUI implements Listener {
         sortedEntries.sort(Map.Entry.comparingByValue(Comparator.reverseOrder()));
 
 
-        //noinspection ExtractMethodRecommender
         int rank = 1; // Default to 1 in case the player is not found for some reason
         for (Map.Entry<Player, Integer> entry : sortedEntries) {
             if (entry.getKey().equals(player)) {
@@ -85,16 +84,14 @@ public class UpgradeGUI implements Listener {
         ItemStack rankItem = new ItemStack(Material.GOLD_NUGGET); // Assuming the material
         ItemMeta rankMeta = rankItem.getItemMeta();
         if (rankMeta != null) {
-            rankMeta.setDisplayName("Your Ranking: #" + rank);
+            String rankingMessageTemplate = plugin.getMessage("gui.your_ranking");
+            String rankingMessage = rankingMessageTemplate.replace("%rank%", String.valueOf(rank));
+            // Translate color codes
+            rankingMessage = ChatColor.translateAlternateColorCodes('&', rankingMessage);
+            rankMeta.setDisplayName(rankingMessage);
             rankItem.setItemMeta(rankMeta);
         }
-        inv.setItem(22, rankItem); // Assuming the position
-
-
-
-
-
-
+        inv.setItem(20, rankItem); // Assuming the position
 
         //noinspection DuplicatedCode
         for (int i = 0; i < inv.getSize(); i++) {
@@ -185,16 +182,16 @@ public class UpgradeGUI implements Listener {
             int currentCookies = plugin.loadCookies(player);
 
             String cookiesPerClickItemName = ChatColor.translateAlternateColorCodes('&', plugin.getMessage("gui.cookies_per_click_item").replace("%cookies_per_click%", String.valueOf(cookiesPerClick)));
-            ItemStack cookiesPerClickItem = new ItemStack(Material.YELLOW_TERRACOTTA);
+            ItemStack cookiesPerClickItem = new ItemStack(Material.YELLOW_DYE);
             ItemMeta cookiesPerClickMeta = cookiesPerClickItem.getItemMeta();
             if (cookiesPerClickMeta != null) {
                 cookiesPerClickMeta.setDisplayName(cookiesPerClickItemName);
                 cookiesPerClickItem.setItemMeta(cookiesPerClickMeta);
             }
-            upgradeInv.setItem(22, cookiesPerClickItem);
+            upgradeInv.setItem(14, cookiesPerClickItem);
 
             String currentCookiesItemName = ChatColor.translateAlternateColorCodes('&', plugin.getMessage("gui.current_cookies_item").replace("%current_cookies%", String.valueOf(currentCookies)));
-            ItemStack currentCookiesItem = new ItemStack(Material.BROWN_TERRACOTTA);
+            ItemStack currentCookiesItem = new ItemStack(Material.BROWN_DYE);
             ItemMeta currentCookiesMeta = currentCookiesItem.getItemMeta();
             if (currentCookiesMeta != null) {
                 currentCookiesMeta.setDisplayName(currentCookiesItemName);

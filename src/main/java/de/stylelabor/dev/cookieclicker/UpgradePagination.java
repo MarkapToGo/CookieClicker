@@ -202,8 +202,6 @@ public class UpgradePagination implements Listener {
                     if (CookieClicker.getUpgradeManager().canAffordUpgrade(player, upgrade)) {
                         // Process the upgrade purchase
                         CookieClicker.getUpgradeManager().processUpgradePurchase(player, upgrade);
-                    } else {
-                        player.sendMessage(ChatColor.RED + "You do not have enough cookies to purchase this upgrade.");
                     }
                     break; // Exit the loop once the matching upgrade is found and processed
                 }

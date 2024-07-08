@@ -130,6 +130,18 @@ public final class CookieClicker extends JavaPlugin implements Listener {
         }
     }
 
+    public String getInsufficientCoinsSound() {
+        return getConfig().getString("insufficient-coins-sound.sound", "BLOCK_ANVIL_LAND");
+    }
+
+    public float getInsufficientCoinsVolume() {
+        return (float) getConfig().getDouble("insufficient-coins-sound.volume", 1.0);
+    }
+
+    public float getInsufficientCoinsPitch() {
+        return (float) getConfig().getDouble("insufficient-coins-sound.pitch", 1.0);
+    }
+
     private void setupUpgradesConfig() {
         File upgradesFile = new File(getDataFolder(), "upgrades.yml");
         if (!upgradesFile.exists()) {

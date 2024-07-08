@@ -2,9 +2,11 @@ messages:
   cookie_click: "§aCookie count increased to: §6%cookies%"
   block_break_denied: "§cYou cannot break the clicker block!"
 
+
 gui:
-  upgrade_title: "§6§lCookie Upgrades"
-  cookies_per_click_item: "&eCookies per Click: &6%cookies_per_click%"
+  upgrade_title: "§6§lCookieClicker"
+  cookies_per_click_item: "&6Cookies per Click: &e%cookies_per_click%"
   current_cookies_item: "&6Current Cookies: &e%current_cookies_point%"
+  your_ranking: "&6Your Ranking: &f#&e%rank%"
 
 total_cookies_actionbar: "&6&lCookies: &b%total_cookies_point%"
