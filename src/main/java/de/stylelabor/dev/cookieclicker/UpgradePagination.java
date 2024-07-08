@@ -187,18 +187,23 @@ public class UpgradePagination implements Listener {
                 openInventory(player, currentPage - 1);
             }
         } else if (clickedItem.getType() == Material.BARRIER && Objects.requireNonNull(clickedItem.getItemMeta()).getDisplayName().contains("Back to Main Menu")) {
-            // Handle returning to the main menu
-            // player.closeInventory();
             UpgradeGUI.openInventory(player);
-
         } else {
-            // Handle upgrade item clicks
+
+            String clickedItemName = ChatColor.stripColor(Objects.requireNonNull(clickedItem.getItemMeta()).getDisplayName());
+
             for (Upgrade upgrade : plugin.loadUpgrades()) {
-                if (Objects.requireNonNull(clickedItem.getItemMeta()).getDisplayName().contains(upgrade.getName())) {
+                // Directly use the translated name for comparison, ensuring consistency with displayed names
+                String upgradeName = ChatColor.translateAlternateColorCodes('&', upgrade.getName());
+                upgradeName = ChatColor.stripColor(upgradeName); // Strip color codes for comparison
+
+                if (clickedItemName.equals(upgradeName)) {
                     // Check if the player can afford the upgrade
                     if (CookieClicker.getUpgradeManager().canAffordUpgrade(player, upgrade)) {
                         // Process the upgrade purchase
                         CookieClicker.getUpgradeManager().processUpgradePurchase(player, upgrade);
+                    } else {
+                        player.sendMessage(ChatColor.RED + "You do not have enough cookies to purchase this upgrade.");
                     }
                     break; // Exit the loop once the matching upgrade is found and processed
                 }

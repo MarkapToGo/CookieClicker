@@ -72,8 +72,8 @@ upgrades:
       - "&eCost: &6%cookies_cost%"
       - "&eCookies per Click: &a+ &6%cookies-per-click-gain%"
   upgrade10:
-    name: "&6&lUpgrade 9"
-    item: GLOWSTONE_BLOCK
+    name: "&6&lUpgrade 10"
+    item: DIAMOND_BLOCK
     cost: 1000000
     cookies-per-click: 1000
     lore:
