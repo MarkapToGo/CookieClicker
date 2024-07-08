@@ -14,9 +14,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.List;
-import java.util.Locale;
-import java.util.Objects;
+import java.util.*;
 
 public class UpgradeGUI implements Listener {
 
@@ -29,12 +27,9 @@ public class UpgradeGUI implements Listener {
         int cookiesPerClick = plugin.getCookiesPerClick(player);
         int currentCookies = plugin.getCurrentCookies(player); // Assuming there's a method to fetch current cookies
 
-        plugin.getLogger().info("Fetched cookies per click for player " + player.getName() + ": " + cookiesPerClick);
-        plugin.getLogger().info("Fetched current cookies for player " + player.getName() + ": " + currentCookies);
-
         // Fetch translated names for special items and replace placeholders
         String cookiesItemName = plugin.getMessage("gui.current_cookies_item").replace("%current_cookies_point%", String.format(Locale.GERMAN, "%,d", currentCookies));
-        String cookiesPerClickItemName = plugin.getMessage("gui.cookies_per_click_item").replace("%cookies_per_click%", String.valueOf(cookiesPerClick));
+        String cookiesPerClickItemName = plugin.getMessage("gui.cookies_per_click_item").replace("%cookies_per_click%", String.format(Locale.GERMAN, "%,d", cookiesPerClick));
 
         // Create and add cookies per click item
         ItemStack cookiesPerClickItem = new ItemStack(Material.YELLOW_CONCRETE); // Assuming the material
@@ -61,9 +56,45 @@ public class UpgradeGUI implements Listener {
             upgradesMeta.setDisplayName("Upgrades!");
             upgradesItem.setItemMeta(upgradesMeta);
         }
-
-        // Place the upgrades item in the third row, 6th cell
         inv.setItem(24, upgradesItem);
+
+
+
+
+
+        // Step 1 & 2: Fetch all players' cookies per click and sort them
+        Map<Player, Integer> cookiesPerClickMap = new HashMap<>();
+        for (Player p : Bukkit.getOnlinePlayers()) {
+            int pCookiesPerClick = plugin.getCookiesPerClick(p);
+            cookiesPerClickMap.put(p, pCookiesPerClick);
+        }
+        List<Map.Entry<Player, Integer>> sortedEntries = new ArrayList<>(cookiesPerClickMap.entrySet());
+        sortedEntries.sort(Map.Entry.comparingByValue(Comparator.reverseOrder()));
+
+
+        //noinspection ExtractMethodRecommender
+        int rank = 1; // Default to 1 in case the player is not found for some reason
+        for (Map.Entry<Player, Integer> entry : sortedEntries) {
+            if (entry.getKey().equals(player)) {
+                break; // Found the player, break out of the loop
+            }
+            rank++;
+        }
+
+        // Step 4: Display the ranking in the GUI
+        ItemStack rankItem = new ItemStack(Material.GOLD_NUGGET); // Assuming the material
+        ItemMeta rankMeta = rankItem.getItemMeta();
+        if (rankMeta != null) {
+            rankMeta.setDisplayName("Your Ranking: #" + rank);
+            rankItem.setItemMeta(rankMeta);
+        }
+        inv.setItem(22, rankItem); // Assuming the position
+
+
+
+
+
+
 
         //noinspection DuplicatedCode
         for (int i = 0; i < inv.getSize(); i++) {
