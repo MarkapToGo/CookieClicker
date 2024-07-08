@@ -56,7 +56,24 @@ public class UpgradePagination implements Listener {
             inv.setItem(35, createNavItem("Next Page"));
         }
 
+        // Fill empty slots with the filler item
+        ItemStack fillerItem = createFillerItem();
+        for (int i = 0; i < inv.getSize(); i++) {
+            if (inv.getItem(i) == null) {
+                inv.setItem(i, fillerItem);
+            }
+        }
         player.openInventory(inv);
+    }
+
+    private ItemStack createFillerItem() {
+        ItemStack fillerItem = new ItemStack(Material.GRAY_STAINED_GLASS_PANE);
+        ItemMeta fillerMeta = fillerItem.getItemMeta();
+        if (fillerMeta != null) {
+            fillerMeta.setDisplayName("*");
+            fillerItem.setItemMeta(fillerMeta);
+        }
+        return fillerItem;
     }
 
     @SuppressWarnings("ConstantValue")

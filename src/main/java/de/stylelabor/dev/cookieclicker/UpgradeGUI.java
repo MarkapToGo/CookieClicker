@@ -65,6 +65,19 @@ public class UpgradeGUI implements Listener {
         // Place the upgrades item in the third row, 6th cell
         inv.setItem(24, upgradesItem);
 
+        //noinspection DuplicatedCode
+        for (int i = 0; i < inv.getSize(); i++) {
+            if (inv.getItem(i) == null) { // Check if the slot is empty
+                ItemStack fillerItem = new ItemStack(Material.GRAY_STAINED_GLASS_PANE); // Create a dark gray stained-glass pane
+                ItemMeta fillerMeta = fillerItem.getItemMeta();
+                if (fillerMeta != null) {
+                    fillerMeta.setDisplayName("*"); // Set the display name to "*"
+                    fillerItem.setItemMeta(fillerMeta);
+                }
+                inv.setItem(i, fillerItem); // Place the filler item in the empty slot
+            }
+        }
+
         player.openInventory(inv);
 
         // Play sound
@@ -118,6 +131,7 @@ public class UpgradeGUI implements Listener {
     public static void openUpgradeGUI(Player player, CookieClicker plugin) {
         List<Upgrade> upgrades = JavaPlugin.getPlugin(CookieClicker.class).loadUpgrades();
         int totalPages = (int) Math.ceil((double) upgrades.size() / UpgradePagination.getUpgradesPerPage());
+        Inventory inv = Bukkit.createInventory(null, 45);
 
         if (totalPages > 1) {
             UpgradePagination pagination = new UpgradePagination(plugin);
@@ -155,6 +169,20 @@ public class UpgradeGUI implements Listener {
                 currentCookiesMeta.setDisplayName(currentCookiesItemName);
                 currentCookiesItem.setItemMeta(currentCookiesMeta);
             }
+
+            //noinspection DuplicatedCode
+            for (int i = 0; i < inv.getSize(); i++) {
+                if (inv.getItem(i) == null) { // Check if the slot is empty
+                    ItemStack fillerItem = new ItemStack(Material.GRAY_STAINED_GLASS_PANE); // Create a dark gray stained-glass pane
+                    ItemMeta fillerMeta = fillerItem.getItemMeta();
+                    if (fillerMeta != null) {
+                        fillerMeta.setDisplayName("*"); // Set the display name to "*"
+                        fillerItem.setItemMeta(fillerMeta);
+                    }
+                    inv.setItem(i, fillerItem); // Place the filler item in the empty slot
+                }
+            }
+
             upgradeInv.setItem(6, currentCookiesItem);
             player.openInventory(upgradeInv);
         }
