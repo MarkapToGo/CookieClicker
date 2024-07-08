@@ -52,6 +52,7 @@ import java.util.concurrent.ConcurrentHashMap;
             try {
                 if (!canAffordUpgrade(player, upgrade)) {
                     player.sendMessage("You do not have enough cookies to purchase this upgrade.");
+
                     plugin.getLogger().info("Player " + player.getName() + " cannot afford upgrade.");
                     return;
                 }
