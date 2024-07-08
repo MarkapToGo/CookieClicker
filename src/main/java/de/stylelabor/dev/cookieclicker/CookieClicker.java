@@ -54,6 +54,14 @@ public final class CookieClicker extends JavaPlugin implements Listener {
         // Load language.yml configuration on plugin enable
         loadLanguageConfig();
 
+        // Check if PlaceholderAPI is installed
+        if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
+            // Register the expansion
+            new CookieClickerExpansion(this).register();
+        } else {
+            getLogger().warning("PlaceholderAPI not found, some functionality may not be available.");
+        }
+
         // Load upgrades
         getServer().getPluginManager().registerEvents(new UpgradeGUI(), this);
 
