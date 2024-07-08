@@ -18,7 +18,6 @@ import java.util.concurrent.ConcurrentHashMap;
         private final Map<Player, LinkedList<BossBar>> playerBossBars = new HashMap<>();
         private final ConcurrentHashMap<UUID, Boolean> processingUpgrades = new ConcurrentHashMap<>();
         private final ConcurrentHashMap<UUID, Long> lastUpgradePurchaseTime = new ConcurrentHashMap<>();
-        private final ConcurrentHashMap<UUID, Long> lastSoundPlayTime = new ConcurrentHashMap<>();
 
         public UpgradeManager(CookieClicker plugin) {
             this.plugin = plugin;
@@ -53,16 +52,6 @@ import java.util.concurrent.ConcurrentHashMap;
             try {
                 if (!canAffordUpgrade(player, upgrade)) {
                     plugin.getLogger().info("Player " + player.getName() + " cannot afford upgrade.");
-                    // Check if enough time has passed since the last sound was played
-                    long lastSoundTime = lastSoundPlayTime.getOrDefault(playerId, 0L);
-                    long soundCooldownMillis = 1000; // 1 second before the sound can be played again
-                    if (currentTime - lastSoundTime > soundCooldownMillis) {
-                        String soundName = plugin.getInsufficientCoinsSound();
-                        float volume = plugin.getInsufficientCoinsVolume();
-                        float pitch = plugin.getInsufficientCoinsPitch();
-                        player.playSound(player.getLocation(), Sound.valueOf(soundName), volume, pitch);
-                        lastSoundPlayTime.put(playerId, currentTime); // Update the last sound play time
-                    }
                     return;
                 }
 

@@ -13,11 +13,6 @@ purchase-sound:
   volume: 0.5
   pitch: 1.2
 
-insufficient-coins-sound:
-  sound: BLOCK_ANVIL_LAND
-  volume: 0.4
-  pitch: 1.0
-
 # MySQL configuration section
 storage:
   type: 'MYSQL' # Change to 'MySQL' to use MySQL
