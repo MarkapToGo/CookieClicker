@@ -160,52 +160,54 @@ public class UpgradePagination implements Listener {
 
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
-        if (!(event.getWhoClicked() instanceof Player)) return;
-
-        Player player = (Player) event.getWhoClicked();
-        Inventory inv = event.getClickedInventory();
-        ItemStack clickedItem = event.getCurrentItem();
-
-        // Check if the click is within the upgrade inventory and not the player's own inventory
-        if (inv == null || clickedItem == null || !clickedItem.hasItemMeta() || inv.getType() != InventoryType.CHEST)
-            return;
+        if (!isValidClick(event)) return;
 
         String inventoryTitle = event.getView().getTitle();
         if (!inventoryTitle.contains("Cookie Upgrades - Page")) return;
 
         event.setCancelled(true); // Prevent default inventory click behavior
 
-        // Determine the current page number from the inventory title
-        int currentPage = Integer.parseInt(inventoryTitle.replaceAll("[^0-9]", "")) - 1;
-        int totalPages = (int) Math.ceil((double) plugin.loadUpgrades().size() / UPGRADES_PER_PAGE);
+        handleNavigationClicks(event);
+        handleUpgradeItemClicks(event);
+    }
 
-        if (clickedItem.getType() == Material.ARROW && Objects.requireNonNull(clickedItem.getItemMeta()).getDisplayName().contains("Next Page")) {
-            if (currentPage + 1 < totalPages) {
+    private boolean isValidClick(InventoryClickEvent event) {
+        if (!(event.getWhoClicked() instanceof Player)) return false;
+        Inventory inv = event.getClickedInventory();
+        ItemStack clickedItem = event.getCurrentItem();
+        return inv != null && clickedItem != null && clickedItem.hasItemMeta() && inv.getType() == InventoryType.CHEST;
+    }
+
+    private void handleNavigationClicks(InventoryClickEvent event) {
+        ItemStack clickedItem = event.getCurrentItem();
+        Player player = (Player) event.getWhoClicked();
+        String inventoryTitle = event.getView().getTitle();
+        int currentPage = Integer.parseInt(inventoryTitle.replaceAll("[^0-9]", "")) - 1;
+
+        if (Objects.requireNonNull(clickedItem).getType() == Material.ARROW) {
+            String itemName = ChatColor.stripColor(Objects.requireNonNull(clickedItem.getItemMeta()).getDisplayName());
+            if (itemName.contains("Next Page")) {
                 openInventory(player, currentPage + 1);
-            }
-        } else if (clickedItem.getType() == Material.ARROW && Objects.requireNonNull(clickedItem.getItemMeta()).getDisplayName().contains("Previous Page")) {
-            if (currentPage > 0) {
+            } else if (itemName.contains("Previous Page")) {
                 openInventory(player, currentPage - 1);
             }
-        } else if (clickedItem.getType() == Material.BARRIER && Objects.requireNonNull(clickedItem.getItemMeta()).getDisplayName().contains("Back to Main Menu")) {
+        } else if (clickedItem.getType() == Material.BARRIER) {
             UpgradeGUI.openInventory(player);
-        } else {
+        }
+    }
 
-            String clickedItemName = ChatColor.stripColor(Objects.requireNonNull(clickedItem.getItemMeta()).getDisplayName());
+    private void handleUpgradeItemClicks(InventoryClickEvent event) {
+        ItemStack clickedItem = event.getCurrentItem();
+        Player player = (Player) event.getWhoClicked();
+        String clickedItemName = ChatColor.stripColor(Objects.requireNonNull(Objects.requireNonNull(clickedItem).getItemMeta()).getDisplayName());
 
-            for (Upgrade upgrade : plugin.loadUpgrades()) {
-                // Directly use the translated name for comparison, ensuring consistency with displayed names
-                String upgradeName = ChatColor.translateAlternateColorCodes('&', upgrade.getName());
-                upgradeName = ChatColor.stripColor(upgradeName); // Strip color codes for comparison
-
-                if (clickedItemName.equals(upgradeName)) {
-                    // Check if the player can afford the upgrade
-                    if (CookieClicker.getUpgradeManager().canAffordUpgrade(player, upgrade)) {
-                        // Process the upgrade purchase
-                        CookieClicker.getUpgradeManager().processUpgradePurchase(player, upgrade);
-                    }
-                    break; // Exit the loop once the matching upgrade is found and processed
+        for (Upgrade upgrade : plugin.loadUpgrades()) {
+            String upgradeName = ChatColor.stripColor(ChatColor.translateAlternateColorCodes('&', upgrade.getName()));
+            if (clickedItemName.equals(upgradeName)) {
+                if (CookieClicker.getUpgradeManager().canAffordUpgrade(player, upgrade)) {
+                    CookieClicker.getUpgradeManager().processUpgradePurchase(player, upgrade);
                 }
+                break;
             }
         }
     }
