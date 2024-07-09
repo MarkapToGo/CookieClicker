@@ -71,6 +71,13 @@ public final class CookieClicker extends JavaPlugin implements Listener {
             getLogger().warning("PlaceholderAPI not found, some functionality may not be available.");
         }
 
+        // Check if MySQL is used and attempt to connect
+        if (useMySQL() && !testMySQLConnection()) {
+            getLogger().severe("Unable to establish a connection to the MySQL database. Disabling plugin.");
+            Bukkit.getPluginManager().disablePlugin(this);
+            return; // Stop further execution of the onEnable method
+        }
+
         // Load upgrades
         getServer().getPluginManager().registerEvents(new UpgradeGUI(), this);
 
@@ -116,7 +123,6 @@ public final class CookieClicker extends JavaPlugin implements Listener {
 
     public int getCurrentCookies(Player player) {
         if (useMySQL()) {
-            // MySQL logic
             try (Connection conn = MySQLUtil.getConnection(this);
                  PreparedStatement ps = conn.prepareStatement("SELECT cookies FROM player_cookies WHERE uuid = ?")) {
                 ps.setString(1, player.getUniqueId().toString());
@@ -128,7 +134,6 @@ public final class CookieClicker extends JavaPlugin implements Listener {
             } catch (SQLException e) {
                 getLogger().log(Level.SEVERE, "Could not load current cookies from MySQL", e);
             }
-            // Return default value if not found or error
             getLogger().info("[Debug] Defaulting to 0 currentCookies for player: " + player.getUniqueId() + " due to error or not found in MySQL.");
             return 0;
         } else {
@@ -194,7 +199,6 @@ public final class CookieClicker extends JavaPlugin implements Listener {
 
     public int loadCookies(Player player) {
         if (useMySQL()) {
-            // MySQL logic
             try (Connection conn = MySQLUtil.getConnection(this);
                  PreparedStatement ps = Objects.requireNonNull(conn).prepareStatement("SELECT cookies FROM player_cookies WHERE uuid = ?")) {
                 ps.setString(1, player.getUniqueId().toString());
@@ -206,9 +210,8 @@ public final class CookieClicker extends JavaPlugin implements Listener {
             } catch (SQLException e) {
                 getLogger().log(Level.SEVERE, "Could not load cookies from MySQL", e);
             }
-            return 0; // Default to 0 if not found or error
+            return 0;
         } else {
-            // YAML logic
             File cookiesFile = new File(getDataFolder(), "cookies.yml");
             FileConfiguration cookiesConfig = YamlConfiguration.loadConfiguration(cookiesFile);
             return cookiesConfig.getInt(player.getUniqueId().toString(), 0); // Default to 0 if not found
@@ -218,7 +221,7 @@ public final class CookieClicker extends JavaPlugin implements Listener {
     public void loadCookiesPerClickFromStorage() {
         File cookiesPerClickFile = new File(getDataFolder(), "cookies-per-click.yml");
         if (!cookiesPerClickFile.exists()) {
-            return; // File doesn't exist, nothing to load
+            return;
         }
         FileConfiguration cookiesPerClickConfig = YamlConfiguration.loadConfiguration(cookiesPerClickFile);
         for (String key : cookiesPerClickConfig.getKeys(false)) {
@@ -228,7 +231,6 @@ public final class CookieClicker extends JavaPlugin implements Listener {
         }
     }
 
-    // Method to load cookies per click for a player
     public synchronized int loadCookiesPerClick(Player player) {
         if (useMySQL()) {
             // MySQL logic
@@ -243,16 +245,14 @@ public final class CookieClicker extends JavaPlugin implements Listener {
             } catch (SQLException e) {
                 getLogger().log(Level.SEVERE, "Could not load cookies per click from MySQL", e);
             }
-            return 1; // Default to 1 if not found or error
+            return 1;
         } else {
-            // YAML logic
             return cookiesPerClickMap.getOrDefault(player.getUniqueId(), 1); // Default to 1 if not found
         }
     }
 
     public void saveCookiesPerClick(Player player, int cookiesPerClick) {
         if (useMySQL()) {
-            // MySQL logic
             try (Connection conn = MySQLUtil.getConnection(this);
                  PreparedStatement ps = Objects.requireNonNull(conn).prepareStatement("REPLACE INTO cookies_per_click (uuid, cookies_per_click) VALUES (?, ?)")) {
                 ps.setString(1, player.getUniqueId().toString());
@@ -262,7 +262,6 @@ public final class CookieClicker extends JavaPlugin implements Listener {
                 getLogger().log(Level.SEVERE, "Could not save cookies per click to MySQL", e);
             }
         } else {
-            // YAML logic
             File cookiesPerClickFile = new File(getDataFolder(), "cookies-per-click.yml");
             if (!cookiesPerClickFile.exists()) {
                 try {
@@ -286,9 +285,7 @@ public final class CookieClicker extends JavaPlugin implements Listener {
     }
 
     public int getCookiesPerClick(Player player) {
-        // Check if the storage method is set to use MySQL
         if (useMySQL()) {
-            // MySQL logic
             try (Connection conn = MySQLUtil.getConnection(this);
                  PreparedStatement ps = conn.prepareStatement("SELECT cookies_per_click FROM cookies_per_click WHERE uuid = ?")) {
                 ps.setString(1, player.getUniqueId().toString());
@@ -301,15 +298,13 @@ public final class CookieClicker extends JavaPlugin implements Listener {
             } catch (SQLException e) {
                 getLogger().log(Level.SEVERE, "Could not load cookies per click from MySQL", e);
             }
-            // Return default value if not found or error
             getLogger().info("[Debug] Defaulting to 1 cookiesPerClick for player: " + player.getUniqueId() + " due to error or not found in MySQL.");
             return 1;
         } else {
-            // YAML logic
             File cookiesPerClickFile = new File(getDataFolder(), "cookies-per-click.yml");
             if (!cookiesPerClickFile.exists()) {
                 getLogger().info("[Debug] cookies-per-click.yml does not exist. Returning default value for player: " + player.getUniqueId());
-                return 1; // Return default value if file doesn't exist
+                return 1;
             }
             FileConfiguration cookiesPerClickConfig = YamlConfiguration.loadConfiguration(cookiesPerClickFile);
             int cookiesPerClick = cookiesPerClickConfig.getInt(player.getUniqueId().toString(), 1); // Default to 1 if not found
@@ -318,10 +313,8 @@ public final class CookieClicker extends JavaPlugin implements Listener {
         }
     }
 
-    // Method to save cookies to cookies.yml
     public void saveCookies(Player player, int cookies) {
         if (useMySQL()) {
-            // MySQL logic
             try (Connection conn = MySQLUtil.getConnection(this);
                  PreparedStatement ps = Objects.requireNonNull(conn).prepareStatement("REPLACE INTO player_cookies (uuid, cookies) VALUES (?, ?)")) {
                 ps.setString(1, player.getUniqueId().toString());
@@ -373,11 +366,8 @@ public final class CookieClicker extends JavaPlugin implements Listener {
 
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
-        // Dynamically fetch the title for the "Cookie Upgrades" GUI
         String cookieUpgradesTitle = getGUITitle("upgrade_title", "Cookie Upgrades");
-        // Check if the inventory clicked has a title that matches one of your custom GUIs
         if (cookieUpgradesTitle.equals(event.getView().getTitle())) {
-            // Prevent moving items in, out, or within the GUI
             event.setCancelled(true);
         }
     }
@@ -395,15 +385,44 @@ public final class CookieClicker extends JavaPlugin implements Listener {
         return (float) getConfig().getDouble("purchase-sound.pitch", 1.0);
     }
 
+    /**
+     * Tests the MySQL connection.
+     *
+     * @return true if the connection is successful, false otherwise.
+     */
+    private boolean testMySQLConnection() {
+        try (Connection conn = MySQLUtil.getConnection(this)) {
+            if (conn != null && !conn.isClosed()) {
+                getLogger().info("Successfully connected to the MySQL database.");
+                return true;
+            }
+        } catch (SQLException e) {
+            getLogger().log(Level.SEVERE, "Could not establish a connection to the MySQL database", e);
+        }
+        return false;
+    }
+
     public synchronized void updateCookiesPerClick(Player player, int cookiesPerClick) {
-        // Update the map
         cookiesPerClickMap.put(player.getUniqueId(), cookiesPerClick);
-        // Save to persistent storage
         saveCookiesPerClick(player, cookiesPerClick);
     }
 
     @Override
     public void onDisable() {
-        // Plugin shutdown logic
+        // Cancel scheduled tasks
+        Bukkit.getScheduler().cancelTasks(this);
+        // Display shutdown message
+        String[] shutdownMessage = {
+                "############################",
+                "##    CookieClicker 🍪    ##",
+                "##       by Markap        ##",
+                "##                        ##",
+                "##    [x] DISABLED [x]    ##",
+                "############################"
+        };
+        for (String line : shutdownMessage) {
+            getLogger().info(line);
+        }
     }
+
 }

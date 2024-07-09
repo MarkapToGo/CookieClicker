@@ -18,8 +18,6 @@ public class ClickListener implements Listener {
         this.plugin = plugin;
     }
 
-    // Inside the ClickListener class
-
     @EventHandler
     public void onPlayerUse(PlayerInteractEvent event) {
         if (event.getClickedBlock() == null) {
@@ -38,12 +36,10 @@ public class ClickListener implements Listener {
                 UpgradeGUI.openInventory(event.getPlayer());
             } else if (event.getAction() == Action.LEFT_CLICK_BLOCK) {
 
-                // Ensure cookies per click are applied correctly
                 int cookiesPerClick = plugin.loadCookiesPerClick(event.getPlayer());
                 int cookies = plugin.loadCookies(event.getPlayer()) + cookiesPerClick; // Increment cookies by cookies per click
                 plugin.saveCookies(event.getPlayer(), cookies); // Save new cookie count
 
-                // Correctly get the player from the event and show total cookies in action bar using the plugin instance
                 plugin.showTotalCookiesInActionBar(event.getPlayer());
 
                 // Play sound
