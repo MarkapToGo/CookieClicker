@@ -2,6 +2,7 @@ package de.stylelabor.dev.cookieclicker;
 
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
+import org.bstats.bukkit.Metrics;
 import org.bukkit.*;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -21,6 +22,7 @@ import java.sql.SQLException;
 import java.util.*;
 import java.util.logging.Level;
 
+@SuppressWarnings("unused")
 public final class CookieClicker extends JavaPlugin implements Listener {
 
     private static UpgradeManager upgradeManager; // Declare the upgradeManager variable
@@ -51,6 +53,9 @@ public final class CookieClicker extends JavaPlugin implements Listener {
 
         // Setup locations config
         setupLocationsConfig();
+
+        int pluginId = 22589;
+        Metrics metrics = new Metrics(this, pluginId);
 
         // Ensure config.yml is generated if it does not exist
         saveDefaultConfig();
@@ -289,9 +294,8 @@ public final class CookieClicker extends JavaPlugin implements Listener {
                 ps.setString(1, player.getUniqueId().toString());
                 try (ResultSet rs = ps.executeQuery()) {
                     if (rs.next()) {
-                        int cookiesPerClick = rs.getInt("cookies_per_click");
-                        getLogger().info("[Debug] Fetched " + cookiesPerClick + " cookiesPerClick for player: " + player.getUniqueId());
-                        return cookiesPerClick;
+                        // getLogger().info("[Debug] Fetched " + cookiesPerClick + " cookiesPerClick for player: " + player.getUniqueId());
+                        return rs.getInt("cookies_per_click");
                     }
                 }
             } catch (SQLException e) {

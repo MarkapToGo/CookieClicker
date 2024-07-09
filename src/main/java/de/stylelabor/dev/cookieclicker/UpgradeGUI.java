@@ -30,6 +30,7 @@ public class UpgradeGUI implements Listener {
         // Fetch translated names for special items and replace placeholders
         String cookiesItemName = plugin.getMessage("gui.current_cookies_item").replace("%current_cookies_point%", String.format(Locale.GERMAN, "%,d", currentCookies));
         String cookiesPerClickItemName = plugin.getMessage("gui.cookies_per_click_item").replace("%cookies_per_click%", String.format(Locale.GERMAN, "%,d", cookiesPerClick));
+        String cookiesUpgradeName = plugin.getMessage("gui.upgrade");
 
         // Create and add cookies per click item
         ItemStack cookiesPerClickItem = new ItemStack(Material.YELLOW_DYE); // Assuming the material
@@ -53,7 +54,7 @@ public class UpgradeGUI implements Listener {
         ItemStack upgradesItem = new ItemStack(Material.GREEN_CONCRETE);
         ItemMeta upgradesMeta = upgradesItem.getItemMeta();
         if (upgradesMeta != null) {
-            upgradesMeta.setDisplayName("Upgrades!");
+            upgradesMeta.setDisplayName(cookiesUpgradeName);
             upgradesItem.setItemMeta(upgradesMeta);
         }
         inv.setItem(24, upgradesItem);
@@ -178,6 +179,7 @@ public class UpgradeGUI implements Listener {
         String guiTitle = plugin.getGUITitle("upgrade_title", "Cookie Upgrades");
         if (event.getView().getTitle().equals(guiTitle)) {
             event.setCancelled(true);
+
 
             ItemStack clickedItem = event.getCurrentItem();
             if (clickedItem != null && clickedItem.hasItemMeta() && Objects.requireNonNull(clickedItem.getItemMeta()).hasDisplayName()) {
