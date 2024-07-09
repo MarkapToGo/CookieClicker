@@ -1,12 +1,10 @@
 package de.stylelabor.dev.cookieclicker;
 
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.File;
 import java.util.*;
 
 public class CookieClickerExpansion extends PlaceholderExpansion {
@@ -42,33 +40,24 @@ public class CookieClickerExpansion extends PlaceholderExpansion {
         return plugin.getDescription().getVersion();
     }
 
-    public int calculatePlayerRank(Player player) {
-        // Load all players' cookies into a map
-        Map<UUID, Integer> allPlayerCookies = new HashMap<>();
-        File cookiesFile = new File(plugin.getDataFolder(), "cookies.yml");
-        FileConfiguration cookiesConfig = YamlConfiguration.loadConfiguration(cookiesFile);
-
-        for (String key : cookiesConfig.getKeys(false)) {
-            allPlayerCookies.put(UUID.fromString(key), cookiesConfig.getInt(key));
+    public int calculatePlayerCookiesPerClickRank(Player player) {
+        // Step 1 & 2: Fetch all players' cookies per click and sort them
+        Map<Player, Integer> cookiesPerClickMap = new HashMap<>();
+        for (Player p : Bukkit.getOnlinePlayers()) {
+            int pCookiesPerClick = plugin.getCookiesPerClick(p);
+            cookiesPerClickMap.put(p, pCookiesPerClick);
         }
+        List<Map.Entry<Player, Integer>> sortedEntries = new ArrayList<>(cookiesPerClickMap.entrySet());
+        sortedEntries.sort(Map.Entry.comparingByValue(Comparator.reverseOrder()));
 
-        // Create a list from elements of HashMap
-        List<Map.Entry<UUID, Integer>> list = new LinkedList<>(allPlayerCookies.entrySet());
-
-        // Sort the list
-        list.sort(Map.Entry.comparingByValue(Comparator.reverseOrder()));
-
-        // Find the rank of the current player
-        int rank = 1;
-        for (Map.Entry<UUID, Integer> entry : list) {
-            if (entry.getKey().equals(player.getUniqueId())) {
-                return rank;
+        int rank = 1; // Default to 1 in case the player is not found for some reason
+        for (Map.Entry<Player, Integer> entry : sortedEntries) {
+            if (entry.getKey().equals(player)) {
+                break; // Found the player, break out of the loop
             }
             rank++;
         }
-
-        // Return -1 or any indicator for not found
-        return -1;
+        return rank; // Return the calculated rank
     }
 
     @Override
@@ -95,7 +84,7 @@ public class CookieClickerExpansion extends PlaceholderExpansion {
                 return String.format("%,d", cookiesPerClickPoint);
 
             case "rank":
-                int rank = calculatePlayerRank(player);
+                int rank = calculatePlayerCookiesPerClickRank(player);
                 return rank >= 0 ? String.valueOf(rank) : "N/A"; // Return "N/A" if rank is -1 or any indicator for not found
 
             default:

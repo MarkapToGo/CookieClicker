@@ -23,13 +23,17 @@ import java.util.Objects;
 
 public class UpgradePagination implements Listener {
 
-    private final CookieClicker plugin;
     private static final int UPGRADES_PER_PAGE = 7; // 9 slots in a row - 2 for leaving first and last cell empty
+    private final CookieClicker plugin;
 
     public UpgradePagination(CookieClicker plugin) {
         this.plugin = plugin;
         // Register this class as an event listener
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
+    }
+
+    public static int getUpgradesPerPage() {
+        return UPGRADES_PER_PAGE;
     }
 
     public void openInventory(Player player, int page) {
@@ -137,10 +141,6 @@ public class UpgradePagination implements Listener {
         return slotIndex;
     }
 
-    public static int getUpgradesPerPage() {
-        return UPGRADES_PER_PAGE;
-    }
-
     private ItemStack createNavItem(String name) {
         Material material;
         if ("Back to Main Menu".equals(name)) {
@@ -167,7 +167,8 @@ public class UpgradePagination implements Listener {
         ItemStack clickedItem = event.getCurrentItem();
 
         // Check if the click is within the upgrade inventory and not the player's own inventory
-        if (inv == null || clickedItem == null || !clickedItem.hasItemMeta() || inv.getType() != InventoryType.CHEST) return;
+        if (inv == null || clickedItem == null || !clickedItem.hasItemMeta() || inv.getType() != InventoryType.CHEST)
+            return;
 
         String inventoryTitle = event.getView().getTitle();
         if (!inventoryTitle.contains("Cookie Upgrades - Page")) return;

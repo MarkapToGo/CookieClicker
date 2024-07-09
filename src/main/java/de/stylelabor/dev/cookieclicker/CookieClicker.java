@@ -23,10 +23,14 @@ import java.util.logging.Level;
 
 public final class CookieClicker extends JavaPlugin implements Listener {
 
+    private static UpgradeManager upgradeManager; // Declare the upgradeManager variable
+    private final HashMap<UUID, Integer> cookiesPerClickMap = new HashMap<>();
     private FileConfiguration languageConfig;
     private FileConfiguration upgradesConfig;
-    private final HashMap<UUID, Integer> cookiesPerClickMap = new HashMap<>();
-    private static UpgradeManager upgradeManager; // Declare the upgradeManager variable
+
+    public static UpgradeManager getUpgradeManager() {
+        return upgradeManager;
+    }
 
     @Override
     public void onEnable() {
@@ -95,10 +99,6 @@ public final class CookieClicker extends JavaPlugin implements Listener {
             saveResource("language.yml", false);
         }
         languageConfig = YamlConfiguration.loadConfiguration(languageFile);
-    }
-
-    public static UpgradeManager getUpgradeManager() {
-        return upgradeManager;
     }
 
     public void showTotalCookiesInActionBar(Player player) {

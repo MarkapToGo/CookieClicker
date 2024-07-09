@@ -59,9 +59,6 @@ public class UpgradeGUI implements Listener {
         inv.setItem(24, upgradesItem);
 
 
-
-
-
         // Step 1 & 2: Fetch all players' cookies per click and sort them
         Map<Player, Integer> cookiesPerClickMap = new HashMap<>();
         for (Player p : Bukkit.getOnlinePlayers()) {
@@ -113,47 +110,6 @@ public class UpgradeGUI implements Listener {
         float volume = (float) plugin.getConfig().getDouble("gui_open_sound.volume", 1.0);
         float pitch = (float) plugin.getConfig().getDouble("gui_open_sound.pitch", 1.0);
         player.playSound(player.getLocation(), Sound.valueOf(soundName), volume, pitch);
-    }
-
-    @EventHandler
-    public void onInventoryClick(InventoryClickEvent event) {
-        CookieClicker plugin = JavaPlugin.getPlugin(CookieClicker.class);
-        String guiTitle = plugin.getGUITitle("upgrade_title", "Cookie Upgrades");
-        if (event.getView().getTitle().equals(guiTitle)) {
-            event.setCancelled(true);
-
-            ItemStack clickedItem = event.getCurrentItem();
-            if (clickedItem != null && clickedItem.hasItemMeta() && Objects.requireNonNull(clickedItem.getItemMeta()).hasDisplayName()) {
-                Player player = (Player) event.getWhoClicked();
-
-                List<Upgrade> upgrades = plugin.loadUpgrades();
-                for (Upgrade upgrade : upgrades) {
-                    if (clickedItem.getType() == upgrade.getItem() && clickedItem.getItemMeta().getDisplayName().contains(upgrade.getName())) {
-                        UpgradeManager upgradeManager = new UpgradeManager(plugin);
-                        if (upgradeManager.canAffordUpgrade(player, upgrade)) {
-                            upgradeManager.processUpgradePurchase(player, upgrade);
-                        } else {
-                            player.sendMessage(ChatColor.RED + "You do not have enough cookies to purchase this upgrade.");
-                        }
-                        return; // Exit the method after handling the upgrade item
-                    }
-                }
-
-                // If the clicked item is the green concrete block, open the upgrade GUI
-                if (clickedItem.getType() == Material.GREEN_CONCRETE) {
-                    openUpgradeGUI(player, plugin);
-                }
-            }
-        }
-    }
-
-    @EventHandler
-    public void onInventoryDrag(InventoryDragEvent event) {
-        CookieClicker plugin = JavaPlugin.getPlugin(CookieClicker.class);
-        String guiTitle = plugin.getGUITitle("upgrade_title", "Cookie Upgrades");
-        if (event.getView().getTitle().equals(guiTitle)) {
-            event.setCancelled(true); // Prevent dragging items within the GUI
-        }
     }
 
     public static void openUpgradeGUI(Player player, CookieClicker plugin) {
@@ -213,6 +169,47 @@ public class UpgradeGUI implements Listener {
 
             upgradeInv.setItem(6, currentCookiesItem);
             player.openInventory(upgradeInv);
+        }
+    }
+
+    @EventHandler
+    public void onInventoryClick(InventoryClickEvent event) {
+        CookieClicker plugin = JavaPlugin.getPlugin(CookieClicker.class);
+        String guiTitle = plugin.getGUITitle("upgrade_title", "Cookie Upgrades");
+        if (event.getView().getTitle().equals(guiTitle)) {
+            event.setCancelled(true);
+
+            ItemStack clickedItem = event.getCurrentItem();
+            if (clickedItem != null && clickedItem.hasItemMeta() && Objects.requireNonNull(clickedItem.getItemMeta()).hasDisplayName()) {
+                Player player = (Player) event.getWhoClicked();
+
+                List<Upgrade> upgrades = plugin.loadUpgrades();
+                for (Upgrade upgrade : upgrades) {
+                    if (clickedItem.getType() == upgrade.getItem() && clickedItem.getItemMeta().getDisplayName().contains(upgrade.getName())) {
+                        UpgradeManager upgradeManager = new UpgradeManager(plugin);
+                        if (upgradeManager.canAffordUpgrade(player, upgrade)) {
+                            upgradeManager.processUpgradePurchase(player, upgrade);
+                        } else {
+                            player.sendMessage(ChatColor.RED + "You do not have enough cookies to purchase this upgrade.");
+                        }
+                        return; // Exit the method after handling the upgrade item
+                    }
+                }
+
+                // If the clicked item is the green concrete block, open the upgrade GUI
+                if (clickedItem.getType() == Material.GREEN_CONCRETE) {
+                    openUpgradeGUI(player, plugin);
+                }
+            }
+        }
+    }
+
+    @EventHandler
+    public void onInventoryDrag(InventoryDragEvent event) {
+        CookieClicker plugin = JavaPlugin.getPlugin(CookieClicker.class);
+        String guiTitle = plugin.getGUITitle("upgrade_title", "Cookie Upgrades");
+        if (event.getView().getTitle().equals(guiTitle)) {
+            event.setCancelled(true); // Prevent dragging items within the GUI
         }
     }
 }
