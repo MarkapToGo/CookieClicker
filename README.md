@@ -25,22 +25,22 @@ Can be found on the spigot page!
 > Returns the total amount of cookies the player has.
 
 ```
-total_cookies_point" 
+%total_cookies_point% 
 ```
 >Returns the total amount of cookies the player has but with a point. Example: 1.000.000 It is often better to read.
 
 ```
-cookies_per_click
+%cookies_per_click%
 ```    
 > Returns the amount of cookies the player gets per click.
 
 ```
-cookies_per_click_point
+%cookies_per_click_point%
 ```
 > Returns the amount of cookies the player gets per click but with a point. Example: 200.000 It is often better to read.
 
 ```
-rank
+%rank%
 ```
 > Returns the rank of the player. The player with the most cookies per click has the highest rank.
 
